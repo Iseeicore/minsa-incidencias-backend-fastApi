@@ -3,14 +3,11 @@ from typing import TYPE_CHECKING
 from app.constants.sesion import FAKE_PASSWORD
 from app.errors.credenciales_invalidas import CredencialesInvalidas
 from app.shared.actor import actor_usuario_interno
+from app.shared.correo import normalizar_correo
 
 if TYPE_CHECKING:
     from app.acceso.application.ports import SesionStore, UsuarioFinder
     from app.shared.ports import PasswordHasher
-
-
-def normalizar_correo(correo: str) -> str:
-    return correo.strip().lower()
 
 
 class IniciarSesion:

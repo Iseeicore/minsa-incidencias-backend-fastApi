@@ -8,3 +8,4 @@ CLAVE_INICIAL_ALFABETO = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz234567
 RESTRICCION_CORREO_UNICO = "uq_usuario_interno_correo"
 SIN_CAMBIOS_ERROR_TYPE = "sin_cambios"
 SIN_CAMBIOS_MENSAJE = "Indica al menos un dato para cambiar."
+CLAVE_MINIMA_DE_COMANDO = 12

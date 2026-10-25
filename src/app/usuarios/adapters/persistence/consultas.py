@@ -47,6 +47,8 @@ BUSCAR_POR_ID_BLOQUEANDO = text(
     """
 )
 AREA_ACTIVA = text("SELECT id FROM catalogo.area WHERE codigo = :codigo AND activo")
+ROL_ACTIVO = text("SELECT EXISTS (SELECT 1 FROM gestion.rol WHERE codigo = :rol AND activo)")
+CORREO_EXISTE = text("SELECT EXISTS (SELECT 1 FROM gestion.usuario_interno WHERE correo = :correo)")
 CREAR = text(
     """
     INSERT INTO gestion.usuario_interno (nombre_completo, correo, password_hash, area_id)

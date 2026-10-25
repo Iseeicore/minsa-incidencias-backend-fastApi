@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 
 from app.clasificador_externo import correr_clasificador
 from app.config.settings import Settings
-from app.constants.clasificacion import CODIGO_DE_SALIDA_CORRECTO, CODIGO_DE_SALIDA_FALLIDO
+from app.constants.salida import CODIGO_DE_SALIDA_CORRECTO, CODIGO_DE_SALIDA_FALLIDO
 from tests.helpers.base import consultar
 from tests.helpers.casos import sembrar_caso
 

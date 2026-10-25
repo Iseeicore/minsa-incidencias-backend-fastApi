@@ -55,3 +55,20 @@ class NuevoUsuarioFila:
 class UsuarioConClave:
     usuario: UsuarioGestionado
     clave_inicial: str
+
+
+@dataclass(frozen=True, slots=True)
+class DatosDeAdministrador:
+    nombre_completo: str
+    correo: str
+    password: str
+    area: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
+class DatosDeUsuarioDePrueba:
+    nombre_completo: str
+    correo: str
+    password: str
+    rol: RolCodigo
+    area: str | None = None

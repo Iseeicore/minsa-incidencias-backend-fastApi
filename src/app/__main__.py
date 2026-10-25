@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 import uvicorn
 
 from app.clasificador_externo import ejecutar_clasificador
+from app.comandos_de_usuarios import ejecutar_crear_administrador, ejecutar_crear_usuario_de_prueba
 from app.config.settings import get_settings
 from app.constants.limits import APAGADO_TIMEOUT_SEGUNDOS
 
@@ -15,6 +16,8 @@ if TYPE_CHECKING:
     from types import FrameType
 
 COMANDO_CLASIFICADOR = "clasificador"
+COMANDO_CREAR_ADMINISTRADOR = "crear-admin"
+COMANDO_CREAR_USUARIO_DE_PRUEBA = "crear-usuario-prueba"
 OPCION_UNA_VEZ = "--una-vez"
 
 
@@ -49,6 +52,10 @@ def run() -> None:
     argumentos = sys.argv[1:]
     if argumentos[:1] == [COMANDO_CLASIFICADOR]:
         sys.exit(ejecutar_clasificador(una_vez=OPCION_UNA_VEZ in argumentos))
+    if argumentos[:1] == [COMANDO_CREAR_ADMINISTRADOR]:
+        sys.exit(ejecutar_crear_administrador())
+    if argumentos[:1] == [COMANDO_CREAR_USUARIO_DE_PRUEBA]:
+        sys.exit(ejecutar_crear_usuario_de_prueba())
     servir()
 
 

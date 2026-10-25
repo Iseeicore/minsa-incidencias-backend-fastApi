@@ -1,23 +1,18 @@
 import asyncio
-import selectors
 import signal
-import sys
 from typing import TYPE_CHECKING
 
 import structlog
 
 from app.config.settings import get_settings
-from app.constants.clasificacion import (
-    CODIGO_DE_SALIDA_CORRECTO,
-    CODIGO_DE_SALIDA_FALLIDO,
-    INTERVALO_SONDEO_SEGUNDOS,
-    VERSION_CLASIFICADOR_ALGORITMICO,
-)
+from app.constants.clasificacion import INTERVALO_SONDEO_SEGUNDOS, VERSION_CLASIFICADOR_ALGORITMICO
+from app.constants.salida import CODIGO_DE_SALIDA_CORRECTO, CODIGO_DE_SALIDA_FALLIDO
 from app.constants.textos.procesos import (
     EVENTO_CLASIFICADOR_DETENIDO,
     EVENTO_CLASIFICADOR_INICIADO,
     EVENTO_CLASIFICADOR_SE_DETUVO_POR_UN_ERROR,
 )
+from app.shared.bucle import ejecutar_corutina
 from app.shared.ciclo_periodico import repetir_hasta_parar
 from app.shared.database import create_engine
 from app.shared.logging import configure_logging
@@ -55,6 +50,4 @@ async def _correr_hasta_la_senal(settings: Settings, *, una_vez: bool) -> int:
 def ejecutar_clasificador(*, una_vez: bool) -> int:
     settings = get_settings()
     configure_logging(settings.log_level)
-    corutina = _correr_hasta_la_senal(settings, una_vez=una_vez)
-    fabrica = (lambda: asyncio.SelectorEventLoop(selectors.SelectSelector())) if sys.platform == "win32" else None
-    return asyncio.run(corutina, loop_factory=fabrica)
+    return ejecutar_corutina(_correr_hasta_la_senal(settings, una_vez=una_vez))

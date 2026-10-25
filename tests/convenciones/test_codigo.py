@@ -20,6 +20,7 @@ ESPEJO_SIN_PRUEBA_PROPIA = {
     "wiring.py": "lo cubre tests/test_wiring.py con una base real",
     "__main__.py": "punto de entrada del contenedor; excluido de la cobertura por BC21",
     "clasificador_externo.py": "proceso externo del clasificador; lo ejercita tests/test_clasificador_externo.py",
+    "comandos_de_usuarios.py": "comandos de una sola vez; los ejercita tests/test_comandos_de_usuarios.py",
     "filtro_corrupcion/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "archivador/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "eventos/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",

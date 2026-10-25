@@ -82,6 +82,12 @@ class SqlUsuarioTransaction:
     async def area_activa(self, codigo: str) -> int | None:
         return (await self._connection.execute(consultas.AREA_ACTIVA, {"codigo": codigo})).scalar_one_or_none()
 
+    async def rol_activo(self, rol: RolCodigo) -> bool:
+        return bool((await self._connection.execute(consultas.ROL_ACTIVO, {"rol": rol.value})).scalar_one())
+
+    async def correo_existe(self, correo: str) -> bool:
+        return bool((await self._connection.execute(consultas.CORREO_EXISTE, {"correo": correo})).scalar_one())
+
     async def crear(self, datos: NuevoUsuarioFila) -> str:
         parametros = {
             "nombre_completo": datos.nombre_completo,

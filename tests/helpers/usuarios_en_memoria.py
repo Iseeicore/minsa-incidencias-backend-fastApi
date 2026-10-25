@@ -27,6 +27,8 @@ class UsuariosEnMemoria:
         self.actores: list[str] = []
         self.sesiones_cerradas: list[str] = []
         self.areas_inactivas: set[str] = set()
+        self.roles_inactivos: set[str] = set()
+        self.correo_existe_ciego = False
 
     async def listar(
         self, filtros: FiltrosDeUsuarios, limite: int, despues_de: PosicionPorNombre[str] | None
@@ -76,6 +78,14 @@ class TransaccionEnMemoria:
         if codigo in self._almacen.areas_inactivas or codigo not in AREAS_DE_PRUEBA:
             return None
         return AREAS_DE_PRUEBA[codigo][0]
+
+    async def rol_activo(self, rol: RolCodigo) -> bool:
+        return rol.value not in self._almacen.roles_inactivos
+
+    async def correo_existe(self, correo: str) -> bool:
+        if self._almacen.correo_existe_ciego:
+            return False
+        return any(usuario.correo == correo for usuario in self._almacen.usuarios.values())
 
     async def crear(self, datos: NuevoUsuarioFila) -> str:
         if any(usuario.correo == datos.correo for usuario in self._almacen.usuarios.values()):
