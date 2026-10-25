@@ -43,6 +43,7 @@ Base genérica de un backend FastAPI con arquitectura hexagonal y DDD, construid
 | 7 | Hecho: primer commit (`91735db`) y columna Commit de las mediciones | BC12 |
 | 9 | Hecho: carpetas puras (`constants`, `enums`, `errors`), un enum y un error por archivo, textos y regex aislados, con pruebas guardianas | BA36, BA56, BA62, BA65, BA67 |
 | 10 | Hecho: hooks verificados con un commit y un push reales, CI simulado en Linux limpio y `HEAD` en la salud | BC24, BT16 |
+| 11 | Pendiente: publicar en GitHub (`Iseeicore/minsa-incidencias-backend-fastApi`, vacío y público) tras la confirmación del responsable; después, GitLab | BC37 |
 | 8 | Pendientes de la auditoría, diferidos a propósito: clave de idempotencia en `POST` (BA151), fijar `actions/checkout` por SHA, entidad devuelta al controlador (BA02) | BA151, BA02 |
 
 ## Fuera de la base

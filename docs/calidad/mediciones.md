@@ -46,6 +46,9 @@ Todas las filas se midieron sobre el árbol del primer commit (`91735db`); esta 
 | 2026-10-24 | `fcb1ccf` | 5. Hooks y CI simulado | Pre-commit real (`git commit`) | `lefthook` | formato, lint, tipos y pruebas pasan | todos | Falló una vez por las comillas de `-m "not integration"`; corregido con una tarea de `poe` y una guardiana |
 | 2026-10-24 | `fcb1ccf` | 5. Hooks y CI simulado | Pre-push real (`git push` a un remoto local desechable) | `lefthook` | con base pasa; sin `TEST_DATABASE_URL` se bloquea con un solo mensaje; con `LEFTHOOK_EXCLUDE=integracion` pasa | los tres | Prueba manual, no automatizada |
 | 2026-10-24 | `fcb1ccf` | 5. Hooks y CI simulado | CI en contenedor Linux limpio con `CI=true` | `docker run python:3.14.7-slim-bookworm` y `poe verificar` | código de salida 0 (673 pruebas, 97,33 %) | 0 | Prueba manual; el árbol entra por `tar` para conservar los modos de git |
+| 2026-10-24 | `2e4edc2` | 6. Hooks definitivos | Pre-push real con base disponible | `git push` y `lefthook` | `integracion` 5,8 s y `verificar` 35 s, ambos pasan | pasan | Prueba manual contra un remoto local desechable |
+| 2026-10-24 | `2e4edc2` | 6. Hooks definitivos | Pre-push real sin `TEST_DATABASE_URL` | `git push` y `lefthook` | bloqueado en 4,5 s con `verificar (skip)` y un solo mensaje | bloquea sin correr `verificar` | Antes tardaba 28 s: `fail_fast` no existe en `lefthook`; la opción real es `piped` |
+| 2026-10-24 | `2e4edc2` | 6. Hooks definitivos | Pruebas de los hooks (`tests/convenciones/test_hooks.py`) | `uv run poe test` | 15 de 15; fallan si vuelve `fail_fast` o una comilla | todas | Comprobado reintroduciendo cada defecto |
 
 ## Exclusiones de cobertura
 
