@@ -7,11 +7,15 @@ from app.acceso.application.iniciar_sesion import IniciarSesion
 from app.catalogos.application.listar_areas import ListarAreas
 from app.catalogos.application.listar_plazos import ListarPlazos
 from app.composition import Container, create_app
+from app.incidencias.application.consultar_derivacion import ConsultarDerivacion
 from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
+from app.incidencias.application.contar_derivaciones import ContarDerivaciones
 from app.incidencias.application.contar_incidencias import ContarIncidencias
 from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+from app.incidencias.application.contenido_de_evidencia_derivada import ContenidoDeEvidenciaDerivada
 from app.incidencias.application.ejecutar_accion import EjecutarAccion
 from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
+from app.incidencias.application.listar_derivaciones import ListarDerivaciones
 from app.incidencias.application.listar_incidencias import ListarIncidencias
 from app.incidencias.domain.plazo import PlazosConfigurados
 from app.shared.http_security import HttpSecurity
@@ -29,6 +33,7 @@ from tests.helpers.acceso_en_memoria import (
     UsuariosDeAccesoEnMemoria,
 )
 from tests.helpers.builders import los_plazos_del_catalogo, una_seguridad, una_sesion
+from tests.helpers.derivaciones_en_memoria import DerivacionesEnMemoria
 from tests.helpers.fakes import (
     FixedClock,
     InMemoryPlazoRepository,
@@ -54,13 +59,17 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
     areas: AreasEnMemoria | None = None,
     hasher: HasherFalso | None = None,
     incidencias: IncidenciasEnMemoria | None = None,
+    derivaciones: DerivacionesEnMemoria | None = None,
 ) -> Container:
     plazos = repositorio or InMemoryPlazoRepository(los_plazos_del_catalogo())
     almacen = usuarios or UsuariosEnMemoria()
     sesiones = sesiones_de_acceso or SesionesDeAccesoEnMemoria()
     claves = hasher or HasherFalso()
     casos = incidencias or IncidenciasEnMemoria()
+    envios = derivaciones or DerivacionesEnMemoria()
     plazos_de_incidencia = PlazosConfigurados(vigencia_dias=30, aviso_horas=48)
+    consultar_incidencia = ConsultarIncidencia(casos, plazos_de_incidencia)
+    contenido_de_evidencia = ContenidoDeEvidencia(casos)
     return Container(
         listar_plazos=ListarPlazos(plazos),
         listar_areas=ListarAreas(areas or AreasEnMemoria()),
@@ -73,9 +82,13 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
         listar_incidencias=ListarIncidencias(casos, plazos_de_incidencia),
         contar_incidencias=ContarIncidencias(casos, plazos_de_incidencia),
         incidencias_por_vencer=IncidenciasPorVencer(casos, plazos_de_incidencia),
-        consultar_incidencia=ConsultarIncidencia(casos, plazos_de_incidencia),
-        contenido_de_evidencia=ContenidoDeEvidencia(casos),
+        consultar_incidencia=consultar_incidencia,
+        contenido_de_evidencia=contenido_de_evidencia,
         ejecutar_accion=EjecutarAccion(casos, casos, plazos_de_incidencia),
+        listar_derivaciones=ListarDerivaciones(envios),
+        contar_derivaciones=ContarDerivaciones(envios),
+        consultar_derivacion=ConsultarDerivacion(envios, consultar_incidencia),
+        contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
         database_probe=sonda or StaticDatabaseProbe(base_disponible),
         clock=FixedClock(),
         session_resolver=resolvedor or SesionesEnMemoria(),

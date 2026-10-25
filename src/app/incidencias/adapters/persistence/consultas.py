@@ -8,10 +8,12 @@ from app.constants.incidencias import (
 )
 from app.enums.estado_incidencia import EstadoIncidencia
 from app.enums.tipo_area import TipoArea
+from app.incidencias.adapters.persistence.envio_de_otrans import envio_humano_desde_otrans
+from app.incidencias.domain.consultas import VisibilidadDeDerivaciones, VisibilidadDeIpress
 from app.shared.text_search import like_pattern
 
 if TYPE_CHECKING:
-    from app.incidencias.domain.consultas import FiltrosCasos, VisibilidadOperativa
+    from app.incidencias.domain.consultas import FiltrosCasos, Visibilidad, VisibilidadOperativa
     from app.shared.permisos import ReglaDeAccion
     from app.shared.sql_params import ParametrosSql
 
@@ -28,7 +30,15 @@ ESTADOS_ABIERTOS_VALORES = [estado.value for estado in ESTADOS_ABIERTOS]
 ESCAPE_DE_LIKE = "ESCAPE '\\'"
 
 
-def visibilidad(p: ParametrosSql, visible: VisibilidadOperativa) -> str:
+def visibilidad(p: ParametrosSql, visible: Visibilidad) -> str:
+    if isinstance(visible, VisibilidadDeIpress):
+        return f"i.establecimiento_id = {p.con_tipo(visible.establecimiento_id, 'int')}"
+    if isinstance(visible, VisibilidadDeDerivaciones):
+        return f"EXISTS (SELECT 1 {envio_humano_desde_otrans(p)})"
+    return _visibilidad_por_rol(p, visible)
+
+
+def _visibilidad_por_rol(p: ParametrosSql, visible: VisibilidadOperativa) -> str:
     roles = p.con_tipo(list(visible.roles), "text[]")
     sin_categoria = p.con_tipo(visible.ver_sin_categoria, "boolean")
     area = p.con_tipo(visible.area_id, "int")
@@ -46,7 +56,7 @@ def visibilidad(p: ParametrosSql, visible: VisibilidadOperativa) -> str:
   )"""
 
 
-def condiciones_base(p: ParametrosSql, visible: VisibilidadOperativa) -> list[str]:
+def condiciones_base(p: ParametrosSql, visible: Visibilidad) -> list[str]:
     return ["i.activo", f"e.codigo = ANY({p.con_tipo(ESTADOS_CONOCIDOS, 'text[]')})", visibilidad(p, visible)]
 
 

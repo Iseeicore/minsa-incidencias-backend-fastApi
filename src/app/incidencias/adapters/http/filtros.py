@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from typing import Annotated
 
 from fastapi import Query
@@ -73,6 +74,24 @@ def _validar_plazo(filtros: FiltrosConsulta, errores: list[Detalle]) -> None:
         errores.append({"path": "plazo", "message": MENSAJE_PLAZO_SOLO_CASOS_ABIERTOS})
 
 
+@dataclass(frozen=True, slots=True)
+class CamposComunes:
+    texto: str | None
+    establecimiento: str | None
+    desde: str | None
+    hasta: str | None
+
+
+def campos_comunes(
+    texto: str | None, establecimiento: str | None, desde: str | None, hasta: str | None, errores: list[Detalle]
+) -> CamposComunes:
+    dia_desde = _dia(desde, "desde", errores)
+    dia_hasta = _dia(hasta, "hasta", errores)
+    campos = CamposComunes(texto or None, _establecimiento(establecimiento, errores), dia_desde, dia_hasta)
+    _validar_rango(dia_desde, dia_hasta, errores)
+    return campos
+
+
 def armar_filtros(  # noqa: PLR0913, PLR0917
     estado: EstadoApi | None,
     motivo_archivo: MotivoArchivo | None,
@@ -84,24 +103,22 @@ def armar_filtros(  # noqa: PLR0913, PLR0917
     plazo: PlazoFiltro | None,
     errores: list[Detalle],
 ) -> FiltrosConsulta:
-    dia_desde = _dia(desde, "desde", errores)
-    dia_hasta = _dia(hasta, "hasta", errores)
+    campos = campos_comunes(texto, establecimiento, desde, hasta, errores)
     filtros = FiltrosConsulta(
         estado=estado,
         categoria=categoria,
-        texto=texto or None,
-        establecimiento=_establecimiento(establecimiento, errores),
+        texto=campos.texto,
+        establecimiento=campos.establecimiento,
         motivo_archivo=motivo_archivo,
-        desde=dia_desde,
-        hasta=dia_hasta,
+        desde=campos.desde,
+        hasta=campos.hasta,
         por_vencer=plazo is not None,
     )
-    _validar_rango(dia_desde, dia_hasta, errores)
     _validar_plazo(filtros, errores)
     return filtros
 
 
-def _fallar_si_hay_errores(errores: list[Detalle]) -> None:
+def fallar_si_hay_errores(errores: list[Detalle]) -> None:
     if errores:
         raise DatosInvalidos(details=errores)
 
@@ -118,7 +135,7 @@ def filtros_de_conteos(  # noqa: PLR0913, PLR0917
 ) -> FiltrosConsulta:
     errores: list[Detalle] = []
     filtros = armar_filtros(estado, motivo_archivo, categoria, texto, establecimiento, desde, hasta, plazo, errores)
-    _fallar_si_hay_errores(errores)
+    fallar_si_hay_errores(errores)
     return filtros
 
 
@@ -143,7 +160,7 @@ def consulta_de_listado(  # noqa: PLR0913, PLR0917
         despues_de = None if filtros.por_vencer else decodificar_cursor(cursor)
         if despues_de is None and despues_de_por_vencer is None:
             errores.append({"path": "cursor", "message": MENSAJE_CURSOR_INVALIDO})
-    _fallar_si_hay_errores(errores)
+    fallar_si_hay_errores(errores)
     return ConsultaListado(
         limite=limite, filtros=filtros, despues_de=despues_de, despues_de_por_vencer=despues_de_por_vencer
     )

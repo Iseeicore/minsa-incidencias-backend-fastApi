@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncEngine
 
     from app.incidencias.domain.caso_consultado import CasoConsultado
-    from app.incidencias.domain.consultas import FiltrosCasos, VisibilidadOperativa
+    from app.incidencias.domain.consultas import FiltrosCasos, Visibilidad
     from app.incidencias.domain.cursores import PosicionDeListado, PosicionPorVencer
     from app.incidencias.domain.fila_historial import FilaHistorial
     from app.shared.permisos import ReglaDeAccion
@@ -33,7 +33,7 @@ class SqlIncidenciaReader:
 
     async def listar(
         self,
-        visible: VisibilidadOperativa,
+        visible: Visibilidad,
         filtros: FiltrosCasos,
         limite: int,
         despues_de: PosicionDeListado | None,
@@ -53,7 +53,7 @@ class SqlIncidenciaReader:
 
     async def listar_proximos_a_vencer(
         self,
-        visible: VisibilidadOperativa,
+        visible: Visibilidad,
         filtros: FiltrosCasos,
         limite: int,
         despues_de: PosicionPorVencer | None,
@@ -71,7 +71,7 @@ class SqlIncidenciaReader:
        LIMIT {p.con_tipo(limite, "int")}"""
         return [caso_de(fila) for fila in await self._filas(sql, p)]
 
-    async def contar_acotado(self, visible: VisibilidadOperativa, filtros: FiltrosCasos, tope: int) -> int:
+    async def contar_acotado(self, visible: Visibilidad, filtros: FiltrosCasos, tope: int) -> int:
         p = ParametrosSql()
         condiciones = [*consultas.condiciones_base(p, visible), *consultas.condiciones_de_filtros(p, filtros)]
         sql = f"""SELECT count(*)::int AS cantidad
@@ -82,7 +82,7 @@ class SqlIncidenciaReader:
         return int(filas[0]["cantidad"]) if filas else 0
 
     async def contar_por_estado(
-        self, visible: VisibilidadOperativa, filtros: FiltrosCasos, tope: int
+        self, visible: Visibilidad, filtros: FiltrosCasos, tope: int
     ) -> dict[EstadoIncidencia, int]:
         p = ParametrosSql()
         condiciones = [
@@ -105,7 +105,7 @@ class SqlIncidenciaReader:
             if fila["estado"] in EstadoIncidencia
         }
 
-    async def buscar_por_codigo(self, codigo: str, visible: VisibilidadOperativa) -> CasoConsultado | None:
+    async def buscar_por_codigo(self, codigo: str, visible: Visibilidad) -> CasoConsultado | None:
         p = ParametrosSql()
         base = consultas.consulta_de_caso(p)
         condiciones = [*consultas.condiciones_base(p, visible), f"i.codigo = {p.agregar(codigo)}"]
@@ -145,7 +145,7 @@ class SqlIncidenciaReader:
         return [fila_de_historial(fila) for fila in filas]
 
     async def contar_por_vencer(
-        self, visible: VisibilidadOperativa, aviso_horas: int, pendientes: tuple[ReglaDeAccion, ...] | None
+        self, visible: Visibilidad, aviso_horas: int, pendientes: tuple[ReglaDeAccion, ...] | None
     ) -> ConteoPorVencer:
         p = ParametrosSql()
         condiciones = [
@@ -162,7 +162,7 @@ class SqlIncidenciaReader:
 
     async def listar_por_vencer(
         self,
-        visible: VisibilidadOperativa,
+        visible: Visibilidad,
         aviso_horas: int,
         limite: int,
         pendientes: tuple[ReglaDeAccion, ...] | None,

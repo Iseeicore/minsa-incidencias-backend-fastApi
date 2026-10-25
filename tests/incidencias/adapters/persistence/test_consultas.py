@@ -2,7 +2,12 @@ from app.enums.categoria_incidencia import CategoriaIncidencia
 from app.enums.estado_incidencia import EstadoIncidencia
 from app.enums.motivo_archivo import MotivoArchivo
 from app.incidencias.adapters.persistence import consultas
-from app.incidencias.domain.consultas import FiltrosCasos, VisibilidadOperativa
+from app.incidencias.domain.consultas import (
+    FiltrosCasos,
+    VisibilidadDeDerivaciones,
+    VisibilidadDeIpress,
+    VisibilidadOperativa,
+)
 from app.shared.permisos import PERMISOS_POR_ROL, ReglaDeAccion
 from app.shared.sql_params import ParametrosSql
 
@@ -110,3 +115,22 @@ def test_la_consulta_de_caso_lleva_los_prefijos_de_actor_como_parametros() -> No
     assert "catalogo.sumar_dias_habiles" in sql
     assert "'{estado_incidencia_id,despues}'" in sql
     assert "AS vence_atencion_en" in sql
+
+
+def test_la_visibilidad_de_un_establecimiento_filtra_por_su_identificador() -> None:
+    p = ParametrosSql()
+
+    sql = consultas.visibilidad(p, VisibilidadDeIpress(establecimiento_id=9))
+
+    assert sql == "i.establecimiento_id = CAST(:p0 AS int)"
+    assert _valores(p) == [9]
+
+
+def test_la_visibilidad_del_seguimiento_pide_un_envio_humano_de_otrans_a_un_establecimiento() -> None:
+    p = ParametrosSql()
+
+    sql = consultas.visibilidad(p, VisibilidadDeDerivaciones())
+
+    assert sql.startswith("EXISTS (SELECT 1")
+    assert "tipo_origen.codigo = :p1" in sql
+    assert _valores(p) == ["usuario:", "OTRANS", "ESTABLECIMIENTO"]

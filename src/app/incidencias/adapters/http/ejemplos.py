@@ -40,3 +40,15 @@ DETALLE_EJEMPLO = {
         }
     ],
 }
+DERIVACION_EJEMPLO = {
+    "id": "4821",
+    "codigoCaso": "MINSA-2026-000001",
+    "fechaDerivacion": "2026-01-15T14:30:00.000Z",
+    "origen": {"codigo": "OTRANS", "nombre": "Oficina de Transparencia Ejemplo"},
+    "destino": {"codigo": "EESS-0001", "nombre": "Centro de Salud Ejemplo", "codigoRenipress": "1"},
+    "derivadoPor": "Lucía Ramos Prueba",
+    "descripcion": "Se devuelve al establecimiento porque corresponde a un reclamo.",
+    "categoria": "reclamo",
+    "estado": "derivado",
+    "motivoArchivo": None,
+}

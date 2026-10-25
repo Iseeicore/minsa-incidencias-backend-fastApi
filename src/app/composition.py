@@ -20,6 +20,7 @@ from app.constants.limits import CORS_MAX_AGE_SECONDS, JSON_BODY_LIMIT_BYTES
 from app.health.router import build_health_router
 from app.incidencias.adapters.http.router import build_incidencias_router
 from app.incidencias.adapters.http.router_de_acciones import build_acciones_router
+from app.incidencias.adapters.http.router_de_derivaciones import build_derivaciones_router
 from app.shared.body_limit import BodyLimitMiddleware
 from app.shared.csrf import CsrfMiddleware
 from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
@@ -37,11 +38,15 @@ if TYPE_CHECKING:
     from app.acceso.application.iniciar_sesion import IniciarSesion
     from app.catalogos.application.listar_areas import ListarAreas
     from app.catalogos.application.listar_plazos import ListarPlazos
+    from app.incidencias.application.consultar_derivacion import ConsultarDerivacion
     from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
+    from app.incidencias.application.contar_derivaciones import ContarDerivaciones
     from app.incidencias.application.contar_incidencias import ContarIncidencias
     from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+    from app.incidencias.application.contenido_de_evidencia_derivada import ContenidoDeEvidenciaDerivada
     from app.incidencias.application.ejecutar_accion import EjecutarAccion
     from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
+    from app.incidencias.application.listar_derivaciones import ListarDerivaciones
     from app.incidencias.application.listar_incidencias import ListarIncidencias
     from app.shared.clock import Clock
     from app.shared.http_security import HttpSecurity
@@ -75,6 +80,10 @@ class Container:
     consultar_incidencia: ConsultarIncidencia
     contenido_de_evidencia: ContenidoDeEvidencia
     ejecutar_accion: EjecutarAccion
+    listar_derivaciones: ListarDerivaciones
+    contar_derivaciones: ContarDerivaciones
+    consultar_derivacion: ConsultarDerivacion
+    contenido_de_evidencia_derivada: ContenidoDeEvidenciaDerivada
     database_probe: DatabaseProbe
     clock: Clock
     session_resolver: SessionResolver
@@ -138,6 +147,14 @@ def create_v1_app(container: Container, *, docs_enabled: bool = False) -> FastAP
         )
     )
     app.include_router(build_acciones_router(container.ejecutar_accion))
+    app.include_router(
+        build_derivaciones_router(
+            container.listar_derivaciones,
+            container.contar_derivaciones,
+            container.consultar_derivacion,
+            container.contenido_de_evidencia_derivada,
+        )
+    )
     app.include_router(
         build_usuarios_router(
             container.listar_usuarios,

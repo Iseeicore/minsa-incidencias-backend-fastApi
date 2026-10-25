@@ -6,6 +6,7 @@ from app.enums.estado_incidencia import EstadoIncidencia
 from app.enums.motivo_archivo import MotivoArchivo
 from app.enums.resultado_resolucion import ResultadoResolucion
 from app.incidencias.domain.caso_consultado import CasoConsultado
+from app.incidencias.domain.derivaciones import DerivacionConsultada
 from app.incidencias.domain.fila_historial import FilaHistorial
 
 type Fila = Mapping[Any, Any]
@@ -53,6 +54,24 @@ def caso_de(fila: Fila) -> CasoConsultado:
         nombre=fila["nombre"],
         canal=fila["canal"],
         sensible=fila["sensible"],
+    )
+
+
+def derivacion_de(fila: Fila) -> DerivacionConsultada:
+    return DerivacionConsultada(
+        id=fila["id"],
+        codigo_caso=fila["codigo_caso"],
+        fecha_derivacion=fila["fecha_derivacion"],
+        origen_codigo=fila["origen_codigo"],
+        origen_nombre=fila["origen_nombre"],
+        destino_codigo=fila["destino_codigo"],
+        destino_nombre=fila["destino_nombre"],
+        destino_renipress=fila["destino_renipress"],
+        derivado_por=fila["derivado_por"],
+        descripcion=fila["descripcion"],
+        categoria=_opcional(fila["categoria"], CategoriaIncidencia),
+        estado=EstadoIncidencia(fila["estado"]),
+        motivo_archivo=_opcional(fila["motivo_archivo"], MotivoArchivo),
     )
 
 

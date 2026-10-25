@@ -13,13 +13,18 @@ from app.composition import Container
 from app.constants.limits import MS_PER_SECOND
 from app.constants.sesion import SECONDS_PER_HOUR
 from app.enums.node_env import NodeEnv
+from app.incidencias.adapters.persistence.derivaciones import SqlDerivacionReader
 from app.incidencias.adapters.persistence.escritura import SqlIncidenciaUnitOfWork
 from app.incidencias.adapters.persistence.repository import SqlIncidenciaReader
+from app.incidencias.application.consultar_derivacion import ConsultarDerivacion
 from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
+from app.incidencias.application.contar_derivaciones import ContarDerivaciones
 from app.incidencias.application.contar_incidencias import ContarIncidencias
 from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+from app.incidencias.application.contenido_de_evidencia_derivada import ContenidoDeEvidenciaDerivada
 from app.incidencias.application.ejecutar_accion import EjecutarAccion
 from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
+from app.incidencias.application.listar_derivaciones import ListarDerivaciones
 from app.incidencias.application.listar_incidencias import ListarIncidencias
 from app.incidencias.domain.plazo import PlazosConfigurados
 from app.shared.clock import SystemClock
@@ -69,7 +74,10 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
     sesiones = SqlSesionStore(engine)
     usuarios_uow = SqlUsuarioUnitOfWork(engine)
     incidencias = SqlIncidenciaReader(engine)
+    derivaciones = SqlDerivacionReader(engine)
     plazos = PlazosConfigurados(settings.vigencia_resolucion_dias, settings.plazo_aviso_horas)
+    consultar_incidencia = ConsultarIncidencia(incidencias, plazos)
+    contenido_de_evidencia = ContenidoDeEvidencia(incidencias)
     return Container(
         listar_plazos=ListarPlazos(SqlPlazoRepository(engine)),
         listar_areas=ListarAreas(SqlAreaFinder(engine)),
@@ -82,9 +90,13 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         listar_incidencias=ListarIncidencias(incidencias, plazos),
         contar_incidencias=ContarIncidencias(incidencias, plazos),
         incidencias_por_vencer=IncidenciasPorVencer(incidencias, plazos),
-        consultar_incidencia=ConsultarIncidencia(incidencias, plazos),
-        contenido_de_evidencia=ContenidoDeEvidencia(incidencias),
+        consultar_incidencia=consultar_incidencia,
+        contenido_de_evidencia=contenido_de_evidencia,
         ejecutar_accion=EjecutarAccion(SqlIncidenciaUnitOfWork(engine), incidencias, plazos),
+        listar_derivaciones=ListarDerivaciones(derivaciones),
+        contar_derivaciones=ContarDerivaciones(derivaciones),
+        consultar_derivacion=ConsultarDerivacion(derivaciones, consultar_incidencia),
+        contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
         database_probe=SqlDatabaseProbe(engine, timeout_seconds=settings.db_connection_timeout_ms / MS_PER_SECOND),
         clock=SystemClock(),
         session_resolver=ResolverSesion(sesiones, settings.session_idle_minutes),
