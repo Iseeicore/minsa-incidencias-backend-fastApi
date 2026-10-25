@@ -1,4 +1,6 @@
+import json
 from dataclasses import dataclass, field
+from pathlib import Path
 from urllib.parse import parse_qsl
 
 import httpx
@@ -7,6 +9,8 @@ from openapi_core.datatypes import RequestParameters
 from werkzeug.datastructures import Headers, ImmutableMultiDict
 
 from app.composition import Container, create_app, create_v1_app
+
+CONTRATO_DEL_NODO = Path(__file__).parents[2] / "docs" / "contrato" / "v1.json"
 
 
 @dataclass
@@ -68,6 +72,10 @@ def openapi_raiz(container: Container) -> OpenAPI:
 
 def openapi_v1(container: Container) -> OpenAPI:
     return OpenAPI.from_dict(create_v1_app(container).openapi())
+
+
+def openapi_del_nodo() -> OpenAPI:
+    return OpenAPI.from_dict(json.loads(CONTRATO_DEL_NODO.read_text(encoding="utf-8")))
 
 
 def validar_contrato(openapi: OpenAPI, respuesta: httpx.Response) -> None:

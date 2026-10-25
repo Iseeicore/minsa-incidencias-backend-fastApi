@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 import selectors
 import uuid
 from collections.abc import AsyncIterator, Callable
@@ -8,9 +9,11 @@ import pytest
 from sqlalchemy import make_url, text
 from sqlalchemy.ext.asyncio import AsyncEngine, create_async_engine
 
-from app.nota.adapters.persistence.tables import metadata
-
 TEST_DATABASE_URL = "TEST_DATABASE_URL"
+TEST_TEMPLATE_DATABASE = "TEST_TEMPLATE_DATABASE"
+PLANTILLA_POR_DEFECTO = "bd_plantilla_desechable"
+SUFIJOS_DESECHABLES = ("_desechable", "_dev", "_local")
+NOMBRE_VALIDO = re.compile(r"^[a-z0-9_]+$")
 
 
 def pytest_asyncio_loop_factories(
@@ -20,11 +23,22 @@ def pytest_asyncio_loop_factories(
     return {"selector": lambda: asyncio.SelectorEventLoop(selectors.SelectSelector())}
 
 
+def _plantilla() -> str:
+    return os.environ.get(TEST_TEMPLATE_DATABASE, PLANTILLA_POR_DEFECTO)
+
+
 def pytest_collection_finish(session: pytest.Session) -> None:
-    necesita_base = any(item.get_closest_marker("integration") for item in session.items)
-    if necesita_base and not os.environ.get(TEST_DATABASE_URL):
+    if not any(item.get_closest_marker("integration") for item in session.items):
+        return
+    if not os.environ.get(TEST_DATABASE_URL):
         pytest.exit(
             f"{TEST_DATABASE_URL} no está definida: las pruebas de integración necesitan una base PostgreSQL",
+            returncode=2,
+        )
+    plantilla = _plantilla()
+    if not NOMBRE_VALIDO.fullmatch(plantilla) or not plantilla.endswith(SUFIJOS_DESECHABLES):
+        pytest.exit(
+            f"{TEST_TEMPLATE_DATABASE} debe ser una base desechable (termina en {', '.join(SUFIJOS_DESECHABLES)})",
             returncode=2,
         )
 
@@ -39,10 +53,8 @@ async def engine() -> AsyncIterator[AsyncEngine]:
     name = f"test_{uuid.uuid4().hex}"
     admin = create_async_engine(admin_url, isolation_level="AUTOCOMMIT")
     async with admin.connect() as connection:
-        await connection.execute(text(f'CREATE DATABASE "{name}"'))
+        await connection.execute(text(f'CREATE DATABASE "{name}" TEMPLATE "{_plantilla()}"'))
     engine = create_async_engine(admin_url.set(database=name))
-    async with engine.begin() as connection:
-        await connection.run_sync(metadata.create_all)
     yield engine
     await engine.dispose()
     async with admin.connect() as connection:

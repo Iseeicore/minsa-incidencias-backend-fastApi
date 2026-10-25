@@ -7,6 +7,7 @@ class ErrorCategory(StrEnum):
     BUSINESS_RULE = "business_rule"
     FORBIDDEN = "forbidden"
     VALIDATION = "validation"
+    UNAUTHENTICATED = "unauthenticated"
     UNAVAILABLE = "unavailable"
     TIMEOUT = "timeout"
     INTERNAL = "internal"

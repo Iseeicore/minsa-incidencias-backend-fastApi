@@ -28,7 +28,7 @@ async def test_la_especificacion_v1_declara_la_version_del_contrato_y_su_prefijo
 
     assert especificacion["info"]["version"] == "1.0.0"
     assert especificacion["servers"] == [{"url": "/v1"}]
-    assert sorted(especificacion["paths"]) == ["/notas", "/notas/{codigo}"]
+    assert sorted(especificacion["paths"]) == ["/catalogos/plazos"]
 
 
 ORIGEN_PERMITIDO = "https://app.minsa.gob.pe"
@@ -64,7 +64,7 @@ async def test_la_peticion_previa_anuncia_metodos_cabeceras_y_vigencia() -> None
         "Access-Control-Request-Headers": "content-type",
     }
     async with un_cliente(un_contenedor(), cors_origins=(ORIGEN_PERMITIDO,)) as cliente:
-        respuesta = await cliente.options("/v1/notas", headers=cabeceras)
+        respuesta = await cliente.options("/v1/catalogos/plazos", headers=cabeceras)
 
     assert respuesta.status_code == HTTPStatus.OK
     assert respuesta.headers["access-control-max-age"] == "600"

@@ -34,6 +34,13 @@ Todas las filas se midieron sobre el árbol del primer commit (`91735db`); esta 
 | 2026-10-24 | `91735db` | 3. Auditoría contra el vault | Cobertura de líneas y ramas, pruebas unitarias | `uv run poe test-coverage` | 96,89 % (395 pruebas) | 96 % | El umbral sube de 95 a 96 |
 | 2026-10-24 | `91735db` | 3. Auditoría contra el vault | Pruebas contra la base (PostgreSQL 16) | `uv run poe test-integration` | 9 de 9 | todas | Incluye restricciones `CHECK` del DDL y su coincidencia con las tablas declaradas |
 | 2026-10-24 | `91735db` | 3. Auditoría contra el vault | Secuencia completa | `uv run poe verificar` | código de salida 0 | 0 | 0 vulnerabilidades |
+| 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Errores de tipos (`mypy --strict`, 89 archivos) | `uv run poe typecheck` | 0 | 0 |  |
+| 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Violaciones de `ruff` con todas las reglas | `uv run poe lint` | 0 | 0 |  |
+| 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Contratos de capas | `uv run poe layers` | 6 cumplidos, 0 rotos | 0 rotos | `app.nota` pasa a `app.catalogos` |
+| 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Cobertura de líneas y ramas, pruebas unitarias | `uv run poe test-coverage` | 98,15 % (599 pruebas) | 98 % | El umbral sube de 96 a 98 |
+| 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Pruebas contra la base (PostgreSQL 16) | `uv run poe test-integration` | 3 de 3 | todas | Base creada desde la plantilla migrada con el esquema del bot |
+| 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Paridad con el contrato del Node | `uv run poe test` | `GET /v1/catalogos/plazos` válido contra `docs/contrato/v1.json` | todas |  |
+| 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Secuencia completa | `uv run poe verificar` | código de salida 0 | 0 | 0 vulnerabilidades |
 | 2026-10-24 | `91735db` | 3. Auditoría contra el vault | Imagen reconstruida desde `git archive` y recorrido contra PostgreSQL 16 | `docker build --no-cache --pull` y `curl` | 201 con `Location`, 422 sin repetir lo enviado, 413 a 150 KB, cabeceras de seguridad, CORS solo del origen permitido, `/docs` 404 en producción, base caída: `/salud/listo` 503 y `/v1/notas` 503 en 15 ms | todo correcto | Prueba manual, no automatizada |
 | 2026-10-24 | `91735db` | 4. Carpetas puras y reglas del vault | Errores de tipos (`mypy --strict`, 92 archivos) | `uv run poe typecheck` | 0 | 0 | |
 | 2026-10-24 | `91735db` | 4. Carpetas puras y reglas del vault | Violaciones de `ruff` con todas las reglas | `uv run poe lint` | 0 | 0 | |

@@ -19,18 +19,17 @@ ESPEJO_SIN_PRUEBA_PROPIA = {
     "main.py": "arranque real; excluido de la cobertura por BC21",
     "__main__.py": "punto de entrada del contenedor; excluido de la cobertura por BC21",
     "config/settings.py": "su prueba vive en tests/config/test_settings.py",
-    "nota/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "catalogos/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "shared/sesion.py": "contenedor de datos cubierto por tests/shared/test_auth_deps.py",
     "shared/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
-    "nota/adapters/http/schemas.py": "los cubren test_router.py y test_contract.py",
-    "nota/adapters/persistence/tables.py": "las cubre test_repository.py",
-    "nota/domain/constantes.py": "solo constantes con nombre",
-    "nota/domain/patrones.py": "la cubren test_codigo_nota.py y las pruebas del repositorio",
+    "catalogos/adapters/http/schemas.py": "los cubren test_router.py y test_contract.py",
+    "catalogos/adapters/persistence/tables.py": "las cubre test_repository.py",
     "shared/http_errors.py": "lo cubre tests/shared/test_http_errors.py",
 }
 CARPETAS_SIN_PRUEBA_PROPIA = {
     "constants": "solo constantes con nombre",
     "enums": "solo miembros de enum",
-    "errors": "clases de error con prueba de conducta en tests/errors y tests/nota/domain/errors",
+    "errors": "clases de error con prueba de conducta en tests/errors y en la carpeta errors de cada contexto",
 }
 
 

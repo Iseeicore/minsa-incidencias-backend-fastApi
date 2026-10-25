@@ -20,6 +20,7 @@ from app.constants.textos.errores import (
     PAYLOAD_TOO_LARGE_MESSAGE,
     REQUEST_INVALID_MESSAGE,
     ROUTE_NOT_FOUND_MESSAGE,
+    SIN_SESION_MESSAGE,
 )
 from app.enums.error_category import ErrorCategory
 from app.enums.error_code import ErrorCode
@@ -41,6 +42,7 @@ HTTP_STATUS_BY_CATEGORY: dict[ErrorCategory, HTTPStatus] = {
     ErrorCategory.BUSINESS_RULE: HTTPStatus.UNPROCESSABLE_ENTITY,
     ErrorCategory.FORBIDDEN: HTTPStatus.FORBIDDEN,
     ErrorCategory.VALIDATION: HTTPStatus.UNPROCESSABLE_ENTITY,
+    ErrorCategory.UNAUTHENTICATED: HTTPStatus.UNAUTHORIZED,
     ErrorCategory.UNAVAILABLE: HTTPStatus.SERVICE_UNAVAILABLE,
     ErrorCategory.TIMEOUT: HTTPStatus.GATEWAY_TIMEOUT,
     ErrorCategory.INTERNAL: HTTPStatus.INTERNAL_SERVER_ERROR,
@@ -97,6 +99,7 @@ UNAVAILABLE_RESPONSE = error_response(
     HTTPStatus.SERVICE_UNAVAILABLE, ErrorCode.DATABASE_UNAVAILABLE, DatabaseUnavailable().message
 )
 TIMEOUT_RESPONSE = error_response(HTTPStatus.GATEWAY_TIMEOUT, ErrorCode.DATABASE_TIMEOUT, DatabaseTimeout().message)
+SIN_SESION_RESPONSE = error_response(HTTPStatus.UNAUTHORIZED, ErrorCode.UNAUTHORIZED, SIN_SESION_MESSAGE)
 INTERNAL_RESPONSE = error_response(HTTPStatus.INTERNAL_SERVER_ERROR, ErrorCode.INTERNAL_ERROR, INTERNAL_ERROR_MESSAGE)
 
 

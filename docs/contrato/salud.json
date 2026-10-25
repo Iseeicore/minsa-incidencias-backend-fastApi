@@ -1,0 +1,159 @@
+{
+  "openapi": "3.1.0",
+  "jsonSchemaDialect": "https://json-schema.org/draft/2020-12/schema",
+  "info": {
+    "title": "Salud del servicio de incidencias",
+    "version": "1.0.0",
+    "description": "Contrato piloto de las dos rutas de salud existentes; no describe el resto de la API ni publica documentación interactiva."
+  },
+  "paths": {
+    "/salud": {
+      "get": {
+        "operationId": "consultarVida",
+        "summary": "Comprobar que el proceso responde, sin consultar PostgreSQL.",
+        "tags": ["Salud"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "El proceso responde.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Las respuestas de salud no se almacenan en caché.",
+                "required": true,
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Salud"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/salud/listo": {
+      "get": {
+        "operationId": "consultarDisponibilidad",
+        "summary": "Comprobar que PostgreSQL responde.",
+        "tags": ["Salud"],
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "El proceso y PostgreSQL responden.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Las respuestas de salud no se almacenan en caché.",
+                "required": true,
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaludLista"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "PostgreSQL no responde; el mensaje no expone datos internos.",
+            "headers": {
+              "Cache-Control": {
+                "description": "Las respuestas de salud no se almacenan en caché.",
+                "required": true,
+                "schema": {
+                  "$schema": "https://json-schema.org/draft/2020-12/schema",
+                  "type": "string",
+                  "const": "no-store"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaludNoDisponible"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Salud": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "estado": {
+            "type": "string",
+            "const": "ok"
+          }
+        },
+        "required": ["estado"],
+        "additionalProperties": false
+      },
+      "SaludLista": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "estado": {
+            "type": "string",
+            "const": "ok"
+          },
+          "baseDeDatos": {
+            "type": "string",
+            "const": "ok"
+          }
+        },
+        "required": ["estado", "baseDeDatos"],
+        "additionalProperties": false
+      },
+      "SaludNoDisponible": {
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "const": false
+          },
+          "statusCode": {
+            "type": "number",
+            "const": 503
+          },
+          "errorCode": {
+            "type": "string",
+            "const": "SERVICE_UNAVAILABLE"
+          },
+          "message": {
+            "type": "string",
+            "const": "El servicio no está disponible en este momento."
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "path": {
+            "type": "string",
+            "const": "/salud/listo"
+          }
+        },
+        "required": ["success", "statusCode", "errorCode", "message", "timestamp", "path"],
+        "additionalProperties": false
+      }
+    }
+  }
+}

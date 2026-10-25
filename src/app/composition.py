@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.catalogos.adapters.http.router import build_catalogos_router
 from app.constants.http import (
     CORS_ALLOWED_HEADERS,
     CORS_ALLOWED_METHODS,
@@ -15,7 +16,6 @@ from app.constants.http import (
 )
 from app.constants.limits import CORS_MAX_AGE_SECONDS, JSON_BODY_LIMIT_BYTES
 from app.health.router import build_health_router
-from app.nota.adapters.http.router import build_nota_router
 from app.shared.body_limit import BodyLimitMiddleware
 from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
 from app.shared.security_headers import SecurityHeadersMiddleware
@@ -24,8 +24,7 @@ if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from contextlib import AbstractAsyncContextManager
 
-    from app.nota.application.consultar_nota import ConsultarNota
-    from app.nota.application.crear_nota import CrearNota
+    from app.catalogos.application.listar_plazos import ListarPlazos
     from app.shared.clock import Clock
     from app.shared.ports import DatabaseProbe
 
@@ -38,8 +37,7 @@ V1_PREFIX = "/v1"
 
 @dataclass(frozen=True, slots=True)
 class Container:
-    crear_nota: CrearNota
-    consultar_nota: ConsultarNota
+    listar_plazos: ListarPlazos
     database_probe: DatabaseProbe
     clock: Clock
 
@@ -69,7 +67,7 @@ def create_v1_app(container: Container, *, docs_enabled: bool = False) -> FastAP
     )
     register_error_handlers(app, container.clock)
     app.add_middleware(UnexpectedErrorMiddleware, clock=container.clock)
-    app.include_router(build_nota_router(container.crear_nota, container.consultar_nota))
+    app.include_router(build_catalogos_router(container.listar_plazos))
     return app
 
 
