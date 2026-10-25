@@ -34,6 +34,7 @@ READY_RESPONSE: dict[int | str, dict[str, object]] = {
 def build_health_router(probe: DatabaseProbe) -> APIRouter:
     router = APIRouter(tags=["salud"])
 
+    @router.head(LIVE_PATH, include_in_schema=False)
     @router.get(
         LIVE_PATH,
         response_model=HealthResponse,
@@ -44,6 +45,7 @@ def build_health_router(probe: DatabaseProbe) -> APIRouter:
     async def live() -> HealthResponse:
         return HealthResponse(status=HealthStatus.OK)
 
+    @router.head(READY_PATH, include_in_schema=False)
     @router.get(
         READY_PATH,
         response_model=HealthResponse,

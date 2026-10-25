@@ -19,6 +19,12 @@ def test_los_hooks_declaran_comandos() -> None:
     assert LINEAS_DE_RUN
 
 
+def test_cada_hook_se_detiene_en_el_primer_fallo() -> None:
+    texto = (RAIZ / "lefthook.yml").read_text(encoding="utf-8")
+
+    assert texto.count("fail_fast: true") == texto.count("\n  commands:")
+
+
 @pytest.mark.parametrize("comando", LINEAS_DE_RUN)
 def test_ningun_comando_de_los_hooks_lleva_comillas(comando: str) -> None:
     assert '"' not in comando

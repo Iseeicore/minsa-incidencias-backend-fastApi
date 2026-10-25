@@ -20,11 +20,17 @@ def pytest_asyncio_loop_factories(
     return {"selector": lambda: asyncio.SelectorEventLoop(selectors.SelectSelector())}
 
 
+def pytest_collection_finish(session: pytest.Session) -> None:
+    necesita_base = any(item.get_closest_marker("integration") for item in session.items)
+    if necesita_base and not os.environ.get(TEST_DATABASE_URL):
+        pytest.exit(
+            f"{TEST_DATABASE_URL} no está definida: las pruebas de integración necesitan una base PostgreSQL",
+            returncode=2,
+        )
+
+
 def _admin_url() -> str:
-    url = os.environ.get(TEST_DATABASE_URL)
-    if not url:
-        pytest.fail(f"{TEST_DATABASE_URL} no está definida: las pruebas de integración necesitan una base PostgreSQL")
-    return url.replace("postgresql://", "postgresql+psycopg://", 1)
+    return os.environ[TEST_DATABASE_URL].replace("postgresql://", "postgresql+psycopg://", 1)
 
 
 @pytest.fixture

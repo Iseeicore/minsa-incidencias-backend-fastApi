@@ -67,6 +67,10 @@ TEST_DATABASE_URL=postgresql://pruebas:CLAVE@127.0.0.1:55432/postgres uv run poe
 
 Para omitir esa parte del pre-push de forma consciente: `LEFTHOOK_EXCLUDE=integracion git push`.
 
+Si falta la variable, las pruebas de integración terminan con un único mensaje y código 2, y el hook se detiene en el primer fallo.
+
+Los comandos de `lefthook.yml` son siempre tareas de `poe` y no llevan comillas: en Windows `lefthook` ejecuta `sh -c "…"` sin escapar las comillas internas y el comando se rompe. Una prueba lo vigila.
+
 ## Estructura de carpetas
 
 ```

@@ -1,4 +1,5 @@
 pre-commit:
+  fail_fast: true
   commands:
     format:
       glob: "*.py"
@@ -14,6 +15,7 @@ pre-commit:
       run: uv run poe test
 
 pre-push:
+  fail_fast: true
   commands:
     verificar:
       run: uv run poe verificar
