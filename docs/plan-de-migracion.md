@@ -58,6 +58,9 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 50. El disparador de NOTIFY lo instala la aplicación al arrancar, bajo `pg_advisory_xact_lock`, como el Node; si falla, el servidor no arranca. La función es la del Node sin comentarios y con el mismo marcador de versión, así que los dos backends se reconocen y no se pisan.
 51. Diferencia: el vencimiento de la sesión no se parte en tramos para evitar el desborde de 2^31 ms del temporizador de JavaScript, porque `asyncio` no tiene ese límite.
 52. Doble backend: el servidor del Node y el de Python, cada uno sobre su base gemela, dieron el mismo código al iniciar sesión, el mismo 401 sin sesión, las mismas cabeceras y los mismos bytes del flujo (`retry`, `cambio` tras un caso nuevo y `sesion` al cerrar sesión). Con esto, las 37 operaciones de `v1.json` están implementadas.
+53. Auditoría de cierre: `tests/paridad/test_openapi.py` compara las 37 operaciones con `v1.json` (identificador, códigos de respuesta, parámetros y si son obligatorios, y la forma de los cuerpos de petición y de éxito: nombres de propiedades y campos obligatorios hasta 6 niveles). No exige igualdad de tipos ni de textos de descripción, y una prueba comprueba que la comparación no sea vacía. El resultado sin diferencias está en `docs/calidad/paridad.md`.
+54. Los scripts `crear-admin` y `crear-usuario-prueba` del Node no estaban en el plan y sin ellos no hay forma de crear el primer administrador: se migran como subcomandos de `python -m app`, con las mismas variables (`ADMIN_*` y `USUARIO_*`), la misma regla de base desechable en el de prueba y las mismas salidas. `generar-openapi` no se migra: FastAPI sirve la especificación y `v1.json` es la referencia. Una huella argon2 generada aquí se verificó con el módulo `argon2` del Node.
+55. Lo que Infraestructura necesita (procesos, variables, privilegios y extensiones de la base, salud, apagado) está en `docs/despliegue.md`. Quedan dos valores por confirmar con ellos: `NODE_ENV` vale `production` si no se define (en el Node valía `development`) y `DB_IDLE_TIMEOUT_MS` solo aproxima la inactividad del pool de Node reciclando conexiones por antigüedad.
 
 ## Fases
 
@@ -71,8 +74,8 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 | 5 | `incidencias`, las siete acciones | Hecha (PR #6) |
 | 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Hecha (PR #7) |
 | 7 | Archivador y clasificador | Hecha (PR #8) |
-| 8 | Eventos en tiempo real (SSE con LISTEN/NOTIFY) | Hecha en su rama |
-| 9 | Cierre: auditoría contra `v1.json`, documentación, variables para Infraestructura | Pendiente |
+| 8 | Eventos en tiempo real (SSE con LISTEN/NOTIFY) | Hecha (PR #9) |
+| 9 | Cierre: auditoría contra `v1.json`, documentación, variables para Infraestructura | Hecha en su rama |
 
 Criterio de salida de cada fase: `poe verificar` en verde, cobertura que no baja del umbral, contratos de capas sin romper, guardianas en verde y pruebas de paridad del corte en verde.
 
