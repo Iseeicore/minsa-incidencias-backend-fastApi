@@ -42,6 +42,10 @@ Todas las filas se midieron sobre el árbol del primer commit (`91735db`); esta 
 | 2026-10-24 | `91735db` | 4. Carpetas puras y reglas del vault | Pruebas contra la base (PostgreSQL 16) | `uv run poe test-integration` | 9 de 9 | todas | |
 | 2026-10-24 | `91735db` | 4. Carpetas puras y reglas del vault | Pruebas guardianas de estructura (BA36, BA56, BA62, BA67) | `uv run poe test` | cada una falla ante su violación | todas | Comprobado introduciendo a propósito una clase de error duplicada, dos enums, un `re.compile` y un número de regla sueltos |
 | 2026-10-24 | `91735db` | 4. Carpetas puras y reglas del vault | Secuencia completa | `uv run poe verificar` | código de salida 0 | 0 | 0 vulnerabilidades |
+| 2026-10-24 | `fcb1ccf` | 5. Hooks y CI simulado | Secuencia completa | `uv run poe verificar` | código de salida 0 (673 pruebas, 97,33 %) | 0 | `mypy` 94 archivos, 0 vulnerabilidades |
+| 2026-10-24 | `fcb1ccf` | 5. Hooks y CI simulado | Pre-commit real (`git commit`) | `lefthook` | formato, lint, tipos y pruebas pasan | todos | Falló una vez por las comillas de `-m "not integration"`; corregido con una tarea de `poe` y una guardiana |
+| 2026-10-24 | `fcb1ccf` | 5. Hooks y CI simulado | Pre-push real (`git push` a un remoto local desechable) | `lefthook` | con base pasa; sin `TEST_DATABASE_URL` se bloquea con un solo mensaje; con `LEFTHOOK_EXCLUDE=integracion` pasa | los tres | Prueba manual, no automatizada |
+| 2026-10-24 | `fcb1ccf` | 5. Hooks y CI simulado | CI en contenedor Linux limpio con `CI=true` | `docker run python:3.14.7-slim-bookworm` y `poe verificar` | código de salida 0 (673 pruebas, 97,33 %) | 0 | Prueba manual; el árbol entra por `tar` para conservar los modos de git |
 
 ## Exclusiones de cobertura
 
