@@ -16,7 +16,17 @@ uv run python -m app
 uv run poe verificar
 ```
 
-Un único proceso: el API. Con Docker: `docker build -t migracion-fast-api .`.
+Un proceso por contenedor: el API, el flujo de eventos y el archivador (y el clasificador si `CLASIFICADOR_MODO=sondeo`). Con Docker: `docker build -t migracion-fast-api .`.
+
+Comandos de una sola vez, con las variables que se indican en `docs/despliegue.md`:
+
+```
+uv run python -m app crear-admin
+uv run python -m app crear-usuario-prueba
+uv run python -m app clasificador --una-vez
+```
+
+Documentación: `docs/despliegue.md` (lo que necesita Infraestructura), `docs/calidad/paridad.md` (cómo se comprueba la paridad con el Node y qué diferencias quedan), `docs/calidad/mediciones.md` y `docs/plan-de-migracion.md` (decisiones y fases).
 
 ## Variables de entorno
 

@@ -25,6 +25,15 @@ async def area_activa_o_error(tx: UsuarioTransaction, codigo: str) -> int:
     return area_id
 
 
+async def area_opcional_o_error(tx: UsuarioTransaction, codigo: str | None, mensaje: str) -> int | None:
+    if codigo is None:
+        return None
+    area_id = await tx.area_activa(codigo)
+    if area_id is None:
+        raise NoProcesable(mensaje.format(codigo=codigo))
+    return area_id
+
+
 async def area_para_crear(
     tx: UsuarioTransaction, sesion: SesionActual, gestion: GestionDeUsuarios, datos: DatosNuevoUsuario
 ) -> int | None:

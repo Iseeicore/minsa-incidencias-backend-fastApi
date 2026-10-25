@@ -1,9 +1,10 @@
 import pytest
 
-from app.acceso.application.iniciar_sesion import IniciarSesion, normalizar_correo
+from app.acceso.application.iniciar_sesion import IniciarSesion
 from app.acceso.domain.usuario_interno import UsuarioInterno
 from app.constants.sesion import FAKE_PASSWORD
 from app.errors.credenciales_invalidas import CredencialesInvalidas
+from app.shared.correo import normalizar_correo
 from tests.helpers.acceso_en_memoria import HasherFalso, SesionesDeAccesoEnMemoria, UsuariosDeAccesoEnMemoria
 from tests.helpers.builders import un_usuario_interno
 

@@ -70,7 +70,9 @@ from app.shared.session_cookie import SessionCookieConfig
 from app.shared.token_bucket import BucketPolicy
 from app.usuarios.adapters.persistence.repository import SqlUsuarioReader, SqlUsuarioUnitOfWork
 from app.usuarios.application.actualizar_usuario import ActualizarUsuario
+from app.usuarios.application.crear_administrador import CrearAdministrador
 from app.usuarios.application.crear_usuario import CrearUsuario
+from app.usuarios.application.crear_usuario_de_prueba import CrearUsuarioDePrueba
 from app.usuarios.application.listar_usuarios import ListarUsuarios
 from app.usuarios.application.restablecer_clave import RestablecerClave
 
@@ -119,6 +121,14 @@ def build_eventos(settings: Settings, engine: AsyncEngine, registro: RegistroDeP
         url.render_as_string(hide_password=False), max(1, settings.db_connection_timeout_ms // MS_PER_SECOND)
     )
     return Eventos(centro, EscucharCambios(SqlInstaladorDeNotificaciones(engine), abridor, publicar, registro))
+
+
+def build_crear_administrador(engine: AsyncEngine) -> CrearAdministrador:
+    return CrearAdministrador(SqlUsuarioUnitOfWork(engine), Argon2PasswordHasher())
+
+
+def build_crear_usuario_de_prueba(engine: AsyncEngine) -> CrearUsuarioDePrueba:
+    return CrearUsuarioDePrueba(SqlUsuarioUnitOfWork(engine), Argon2PasswordHasher())
 
 
 def build_trabajador_clasificador(engine: AsyncEngine, registro: RegistroDeProcesos) -> TrabajadorClasificador:
