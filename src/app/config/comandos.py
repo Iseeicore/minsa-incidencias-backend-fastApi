@@ -4,11 +4,12 @@ from pydantic import StringConstraints
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from app.constants.patrones import EMAIL_PATTERN
+from app.constants.sesion import MAX_EMAIL_LENGTH
 from app.constants.usuarios import CLAVE_MINIMA_DE_COMANDO
 from app.enums.rol_codigo import RolCodigo
 
 type Nombre = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
-type Correo = Annotated[str, StringConstraints(pattern=EMAIL_PATTERN)]
+type Correo = Annotated[str, StringConstraints(max_length=MAX_EMAIL_LENGTH, pattern=EMAIL_PATTERN)]
 type Clave = Annotated[str, StringConstraints(min_length=CLAVE_MINIMA_DE_COMANDO)]
 
 PREFIJO_DE_ADMINISTRADOR = "ADMIN_"

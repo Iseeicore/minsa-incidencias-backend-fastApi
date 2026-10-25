@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Annotated, Self
 from pydantic import StringConstraints
 
 from app.constants.patrones import EMAIL_PATTERN
-from app.constants.sesion import MAX_PASSWORD_LENGTH
+from app.constants.sesion import MAX_EMAIL_LENGTH, MAX_PASSWORD_LENGTH
 from app.enums.tipo_area import TipoArea
 from app.enums.vista_codigo import VistaCodigo
 from app.shared.api_model import ApiModel
@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 
 class LoginRequest(ApiModel):
-    correo: Annotated[str, StringConstraints(pattern=EMAIL_PATTERN)]
+    correo: Annotated[str, StringConstraints(max_length=MAX_EMAIL_LENGTH, pattern=EMAIL_PATTERN)]
     password: Annotated[str, StringConstraints(min_length=1, max_length=MAX_PASSWORD_LENGTH)]
 
 
