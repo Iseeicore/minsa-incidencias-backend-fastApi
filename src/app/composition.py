@@ -18,6 +18,7 @@ from app.constants.http import (
 )
 from app.constants.limits import CORS_MAX_AGE_SECONDS, JSON_BODY_LIMIT_BYTES
 from app.health.router import build_health_router
+from app.incidencias.adapters.http.router import build_incidencias_router
 from app.shared.body_limit import BodyLimitMiddleware
 from app.shared.csrf import CsrfMiddleware
 from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
@@ -35,6 +36,11 @@ if TYPE_CHECKING:
     from app.acceso.application.iniciar_sesion import IniciarSesion
     from app.catalogos.application.listar_areas import ListarAreas
     from app.catalogos.application.listar_plazos import ListarPlazos
+    from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
+    from app.incidencias.application.contar_incidencias import ContarIncidencias
+    from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+    from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
+    from app.incidencias.application.listar_incidencias import ListarIncidencias
     from app.shared.clock import Clock
     from app.shared.http_security import HttpSecurity
     from app.shared.ports import DatabaseProbe, SessionResolver
@@ -61,6 +67,11 @@ class Container:
     crear_usuario: CrearUsuario
     actualizar_usuario: ActualizarUsuario
     restablecer_clave: RestablecerClave
+    listar_incidencias: ListarIncidencias
+    contar_incidencias: ContarIncidencias
+    incidencias_por_vencer: IncidenciasPorVencer
+    consultar_incidencia: ConsultarIncidencia
+    contenido_de_evidencia: ContenidoDeEvidencia
     database_probe: DatabaseProbe
     clock: Clock
     session_resolver: SessionResolver
@@ -114,6 +125,15 @@ def create_v1_app(container: Container, *, docs_enabled: bool = False) -> FastAP
     )
     app.include_router(build_areas_router(container.listar_areas))
     app.include_router(build_catalogos_router(container.listar_plazos))
+    app.include_router(
+        build_incidencias_router(
+            container.listar_incidencias,
+            container.contar_incidencias,
+            container.incidencias_por_vencer,
+            container.consultar_incidencia,
+            container.contenido_de_evidencia,
+        )
+    )
     app.include_router(
         build_usuarios_router(
             container.listar_usuarios,

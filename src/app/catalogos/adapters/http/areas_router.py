@@ -9,7 +9,7 @@ from app.catalogos.domain.area_listada import ConsultaAreas
 from app.constants.areas import AREAS_CURSOR_LONGITUD_MAXIMA, AREAS_LIMITE_MAXIMO, AREAS_LIMITE_POR_DEFECTO
 from app.constants.incidencias import TEXTO_BUSQUEDA_MAXIMO
 from app.constants.textos.errores import MENSAJE_CURSOR_INVALIDO
-from app.enums.tipo_area import TipoArea  # noqa: TC001
+from app.enums.tipo_area import TipoArea
 from app.errors.datos_invalidos import DatosInvalidos
 from app.shared.auth_deps import require_session
 from app.shared.cursor import decode_int_cursor
@@ -20,7 +20,7 @@ from app.shared.http_errors import (
     VALIDATION_RESPONSE,
     json_example,
 )
-from app.shared.sesion import SesionActual  # noqa: TC001
+from app.shared.sesion import SesionActual
 
 if TYPE_CHECKING:
     from app.catalogos.application.listar_areas import ListarAreas

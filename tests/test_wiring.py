@@ -75,6 +75,11 @@ async def test_el_contenedor_arma_todos_los_casos_de_uso_sobre_el_mismo_limitado
         contenedor.crear_usuario,
         contenedor.actualizar_usuario,
         contenedor.restablecer_clave,
+        contenedor.listar_incidencias,
+        contenedor.contar_incidencias,
+        contenedor.incidencias_por_vencer,
+        contenedor.consultar_incidencia,
+        contenedor.contenido_de_evidencia,
         contenedor.session_resolver,
         contenedor.database_probe,
     ):

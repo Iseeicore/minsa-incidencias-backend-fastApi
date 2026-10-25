@@ -1,11 +1,14 @@
 from datetime import UTC, datetime
+from typing import Any
 from urllib.parse import quote
 
 from app.acceso.domain.sesion_vigente import SesionVigente
 from app.acceso.domain.usuario_interno import UsuarioInterno
 from app.catalogos.domain.plazo_de_categoria import PlazoDeCategoria
 from app.enums.categoria_incidencia import CategoriaIncidencia
+from app.enums.estado_incidencia import EstadoIncidencia
 from app.enums.tipo_area import TipoArea
+from app.incidencias.domain.caso_consultado import CasoConsultado, EvidenciaConsultada
 from app.shared.http_security import HttpSecurity
 from app.shared.permisos import vistas_de_roles
 from app.shared.rate_limit import RateLimitPolicies
@@ -148,3 +151,65 @@ def una_seguridad(
 def cabecera_de_cookie(session_id: str, secreto: str = SECRETO_DE_PRUEBA) -> dict[str, str]:
     valor = quote(f"s:{sign(session_id, secreto)}", safe="")
     return {"Cookie": f"gestion_sid={valor}"}
+
+
+def un_caso_consultado(**cambios: Any) -> CasoConsultado:  # noqa: ANN401
+    base: dict[str, Any] = {
+        "id": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
+        "codigo": "MINSA-2026-000001",
+        "estado": EstadoIncidencia.CLASIFICADO,
+        "categoria": CategoriaIncidencia.RECLAMO,
+        "categoria_ia": CategoriaIncidencia.RECLAMO,
+        "confianza_ia": 58.0,
+        "fecha_creacion": datetime(2026, 10, 24, 7, 0, tzinfo=UTC),
+        "resuelto_en": None,
+        "ahora": datetime(2026, 10, 24, 12, 0, tzinfo=UTC),
+        "revisada": False,
+        "corregida": False,
+        "area_codigo": "HOSP-01",
+        "area_nombre": "Hospital Uno",
+        "area_destino_id": 1,
+        "area_origen_id": 1,
+        "establecimiento_codigo": "1234",
+        "establecimiento_nombre": "Hospital Uno",
+        "establecimiento_nivel": "II",
+        "establecimiento_categoria": "II-1",
+        "responsable": None,
+        "medidas_tomadas": None,
+        "fundamento": None,
+        "resultado_resolucion": None,
+        "motivo_archivo": None,
+        "archivo_detalle": None,
+        "archivado_en": None,
+        "reabierto_en": None,
+        "reabierto_motivo": None,
+        "vence_atencion_en": datetime(2026, 11, 23, 12, 0, tzinfo=UTC),
+        "descripcion_derivacion": None,
+        "descripcion": "Relato del caso.",
+        "es_anonimo": True,
+        "dni": None,
+        "nombre": None,
+        "canal": "WhatsApp",
+        "sensible": False,
+    }
+    return CasoConsultado(**{**base, **cambios})
+
+
+def una_evidencia(  # noqa: PLR0913
+    identificador: str = "0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69",
+    nombre: str | None = "foto.png",
+    tipo: str = "IMAGEN",
+    tipo_nombre: str = "Imagen",
+    *,
+    verificada: bool = True,
+    contenido_disponible: bool = True,
+) -> EvidenciaConsultada:
+    return EvidenciaConsultada(
+        id=identificador,
+        nombre=nombre,
+        tipo=tipo,
+        tipo_nombre=tipo_nombre,
+        fecha=datetime(2026, 10, 24, 8, 0, tzinfo=UTC),
+        verificada=verificada,
+        contenido_disponible=contenido_disponible,
+    )

@@ -13,6 +13,13 @@ from app.composition import Container
 from app.constants.limits import MS_PER_SECOND
 from app.constants.sesion import SECONDS_PER_HOUR
 from app.enums.node_env import NodeEnv
+from app.incidencias.adapters.persistence.repository import SqlIncidenciaReader
+from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
+from app.incidencias.application.contar_incidencias import ContarIncidencias
+from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
+from app.incidencias.application.listar_incidencias import ListarIncidencias
+from app.incidencias.domain.plazo import PlazosConfigurados
 from app.shared.clock import SystemClock
 from app.shared.database import SqlDatabaseProbe
 from app.shared.http_security import HttpSecurity
@@ -59,6 +66,8 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
     hasher = Argon2PasswordHasher()
     sesiones = SqlSesionStore(engine)
     usuarios_uow = SqlUsuarioUnitOfWork(engine)
+    incidencias = SqlIncidenciaReader(engine)
+    plazos = PlazosConfigurados(settings.vigencia_resolucion_dias, settings.plazo_aviso_horas)
     return Container(
         listar_plazos=ListarPlazos(SqlPlazoRepository(engine)),
         listar_areas=ListarAreas(SqlAreaFinder(engine)),
@@ -68,6 +77,11 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         crear_usuario=CrearUsuario(usuarios_uow, hasher),
         actualizar_usuario=ActualizarUsuario(usuarios_uow),
         restablecer_clave=RestablecerClave(usuarios_uow, hasher),
+        listar_incidencias=ListarIncidencias(incidencias, plazos),
+        contar_incidencias=ContarIncidencias(incidencias, plazos),
+        incidencias_por_vencer=IncidenciasPorVencer(incidencias, plazos),
+        consultar_incidencia=ConsultarIncidencia(incidencias, plazos),
+        contenido_de_evidencia=ContenidoDeEvidencia(incidencias),
         database_probe=SqlDatabaseProbe(engine, timeout_seconds=settings.db_connection_timeout_ms / MS_PER_SECOND),
         clock=SystemClock(),
         session_resolver=ResolverSesion(sesiones, settings.session_idle_minutes),

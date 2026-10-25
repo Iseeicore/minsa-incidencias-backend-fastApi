@@ -23,6 +23,7 @@ ESPEJO_SIN_PRUEBA_PROPIA = {
     "catalogos/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "acceso/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "usuarios/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "incidencias/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "usuarios/adapters/persistence/consultas.py": "solo consultas SQL; las cubre test_repository.py",
     "shared/sesion.py": "contenedor de datos cubierto por tests/shared/test_auth_deps.py",
     "shared/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
