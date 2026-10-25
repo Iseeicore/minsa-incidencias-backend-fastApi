@@ -10,6 +10,7 @@ from app.composition import Container, create_app
 from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
 from app.incidencias.application.contar_incidencias import ContarIncidencias
 from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+from app.incidencias.application.ejecutar_accion import EjecutarAccion
 from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
 from app.incidencias.application.listar_incidencias import ListarIncidencias
 from app.incidencias.domain.plazo import PlazosConfigurados
@@ -74,6 +75,7 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
         incidencias_por_vencer=IncidenciasPorVencer(casos, plazos_de_incidencia),
         consultar_incidencia=ConsultarIncidencia(casos, plazos_de_incidencia),
         contenido_de_evidencia=ContenidoDeEvidencia(casos),
+        ejecutar_accion=EjecutarAccion(casos, casos, plazos_de_incidencia),
         database_probe=sonda or StaticDatabaseProbe(base_disponible),
         clock=FixedClock(),
         session_resolver=resolvedor or SesionesEnMemoria(),

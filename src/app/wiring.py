@@ -13,10 +13,12 @@ from app.composition import Container
 from app.constants.limits import MS_PER_SECOND
 from app.constants.sesion import SECONDS_PER_HOUR
 from app.enums.node_env import NodeEnv
+from app.incidencias.adapters.persistence.escritura import SqlIncidenciaUnitOfWork
 from app.incidencias.adapters.persistence.repository import SqlIncidenciaReader
 from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
 from app.incidencias.application.contar_incidencias import ContarIncidencias
 from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+from app.incidencias.application.ejecutar_accion import EjecutarAccion
 from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
 from app.incidencias.application.listar_incidencias import ListarIncidencias
 from app.incidencias.domain.plazo import PlazosConfigurados
@@ -82,6 +84,7 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         incidencias_por_vencer=IncidenciasPorVencer(incidencias, plazos),
         consultar_incidencia=ConsultarIncidencia(incidencias, plazos),
         contenido_de_evidencia=ContenidoDeEvidencia(incidencias),
+        ejecutar_accion=EjecutarAccion(SqlIncidenciaUnitOfWork(engine), incidencias, plazos),
         database_probe=SqlDatabaseProbe(engine, timeout_seconds=settings.db_connection_timeout_ms / MS_PER_SECOND),
         clock=SystemClock(),
         session_resolver=ResolverSesion(sesiones, settings.session_idle_minutes),

@@ -1,9 +1,16 @@
+from contextlib import asynccontextmanager
 from typing import TYPE_CHECKING, Any
 
 from app.incidencias.domain.caso_consultado import ConteoPorVencer
 
 if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from app.enums.categoria_incidencia import CategoriaIncidencia
     from app.enums.estado_incidencia import EstadoIncidencia
+    from app.enums.motivo_archivo import MotivoArchivo
+    from app.enums.resultado_resolucion import ResultadoResolucion
+    from app.enums.tipo_area import TipoArea
     from app.incidencias.domain.caso_consultado import CasoConsultado, EvidenciaConsultada
     from app.incidencias.domain.consultas import FiltrosCasos, VisibilidadOperativa
     from app.incidencias.domain.cursores import PosicionDeListado, PosicionPorVencer
@@ -27,6 +34,10 @@ class IncidenciasEnMemoria:
         self.acotado = 0
         self.conteo_por_vencer = ConteoPorVencer(0, 0)
         self.llamadas: list[tuple[str, tuple[Any, ...]]] = []
+        self.actores: list[str] = []
+        self.areas_por_id: dict[tuple[int, TipoArea], int] = {}
+        self.areas_por_codigo: dict[tuple[str, TipoArea], int] = {}
+        self.ocultar_al_cerrar = False
 
     async def listar(
         self,
@@ -89,3 +100,47 @@ class IncidenciasEnMemoria:
     ) -> list[CasoConsultado]:
         self.llamadas.append(("listar_por_vencer", (visible, aviso_horas, limite, pendientes)))
         return self.casos[:limite]
+
+    @asynccontextmanager
+    async def begin(self, actor: str) -> AsyncIterator[IncidenciasEnMemoria]:
+        self.actores.append(actor)
+        yield self
+        if self.ocultar_al_cerrar:
+            self.casos.clear()
+
+    async def buscar_bloqueando(self, codigo: str, visible: VisibilidadOperativa) -> CasoConsultado | None:
+        self.llamadas.append(("buscar_bloqueando", (codigo, visible)))
+        return next((caso for caso in self.casos if caso.codigo == codigo), None)
+
+    async def area_receptora_por_id(self, area_id: int, tipo: TipoArea) -> int | None:
+        self.llamadas.append(("area_receptora_por_id", (area_id, tipo)))
+        return self.areas_por_id.get((area_id, tipo))
+
+    async def area_receptora_por_codigo(self, codigo: str, tipo: TipoArea) -> int | None:
+        self.llamadas.append(("area_receptora_por_codigo", (codigo, tipo)))
+        return self.areas_por_codigo.get((codigo, tipo))
+
+    async def confirmar(self, incidencia_id: str) -> None:
+        self.llamadas.append(("confirmar", (incidencia_id,)))
+
+    async def corregir(
+        self, incidencia_id: str, categoria: CategoriaIncidencia, descripcion_derivacion: str | None
+    ) -> None:
+        self.llamadas.append(("corregir", (incidencia_id, categoria, descripcion_derivacion)))
+
+    async def derivar(self, incidencia_id: str, area_id: int, descripcion_derivacion: str) -> None:
+        self.llamadas.append(("derivar", (incidencia_id, area_id, descripcion_derivacion)))
+
+    async def cambiar_estado(self, incidencia_id: str, estado: EstadoIncidencia) -> None:
+        self.llamadas.append(("cambiar_estado", (incidencia_id, estado)))
+
+    async def resolver(
+        self, incidencia_id: str, medidas_tomadas: str, fundamento: str, resultado: ResultadoResolucion
+    ) -> None:
+        self.llamadas.append(("resolver", (incidencia_id, medidas_tomadas, fundamento, resultado)))
+
+    async def archivar(self, incidencia_id: str, motivo: MotivoArchivo, detalle: str) -> None:
+        self.llamadas.append(("archivar", (incidencia_id, motivo, detalle)))
+
+    async def reabrir(self, incidencia_id: str, motivo: str) -> None:
+        self.llamadas.append(("reabrir", (incidencia_id, motivo)))

@@ -1,7 +1,13 @@
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
+    from contextlib import AbstractAsyncContextManager
+
+    from app.enums.categoria_incidencia import CategoriaIncidencia
     from app.enums.estado_incidencia import EstadoIncidencia
+    from app.enums.motivo_archivo import MotivoArchivo
+    from app.enums.resultado_resolucion import ResultadoResolucion
+    from app.enums.tipo_area import TipoArea
     from app.incidencias.domain.caso_consultado import CasoConsultado, ConteoPorVencer, EvidenciaConsultada
     from app.incidencias.domain.consultas import FiltrosCasos, VisibilidadOperativa
     from app.incidencias.domain.cursores import PosicionDeListado, PosicionPorVencer
@@ -51,3 +57,33 @@ class IncidenciaReader(Protocol):
         limite: int,
         pendientes: tuple[ReglaDeAccion, ...] | None,
     ) -> list[CasoConsultado]: ...
+
+
+class IncidenciaTransaction(Protocol):
+    async def buscar_bloqueando(self, codigo: str, visible: VisibilidadOperativa) -> CasoConsultado | None: ...
+
+    async def area_receptora_por_id(self, area_id: int, tipo: TipoArea) -> int | None: ...
+
+    async def area_receptora_por_codigo(self, codigo: str, tipo: TipoArea) -> int | None: ...
+
+    async def confirmar(self, incidencia_id: str) -> None: ...
+
+    async def corregir(
+        self, incidencia_id: str, categoria: CategoriaIncidencia, descripcion_derivacion: str | None
+    ) -> None: ...
+
+    async def derivar(self, incidencia_id: str, area_id: int, descripcion_derivacion: str) -> None: ...
+
+    async def cambiar_estado(self, incidencia_id: str, estado: EstadoIncidencia) -> None: ...
+
+    async def resolver(
+        self, incidencia_id: str, medidas_tomadas: str, fundamento: str, resultado: ResultadoResolucion
+    ) -> None: ...
+
+    async def archivar(self, incidencia_id: str, motivo: MotivoArchivo, detalle: str) -> None: ...
+
+    async def reabrir(self, incidencia_id: str, motivo: str) -> None: ...
+
+
+class IncidenciaUnitOfWork(Protocol):
+    def begin(self, actor: str) -> AbstractAsyncContextManager[IncidenciaTransaction]: ...

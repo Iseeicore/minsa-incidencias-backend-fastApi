@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, Response
 from app.constants.incidencias import CABECERAS_DE_IMAGEN
 from app.enums.error_code import ErrorCode
 from app.enums.vista_codigo import VistaCodigo
+from app.incidencias.adapters.http.ejemplos import CASO_EJEMPLO, DETALLE_EJEMPLO
 from app.incidencias.adapters.http.filtros import consulta_de_listado, filtros_de_conteos
 from app.incidencias.adapters.http.parametros_de_ruta import codigo_de_incidencia, identificador_de_evidencia
 from app.incidencias.adapters.http.schemas import (
@@ -37,30 +38,6 @@ FORBIDDEN_RESPONSE = error_response(HTTPStatus.FORBIDDEN, ErrorCode.FORBIDDEN)
 NOT_FOUND_RESPONSE = error_response(HTTPStatus.NOT_FOUND, ErrorCode.NOT_FOUND)
 EVIDENCIA_NO_DISPONIBLE_RESPONSE = error_response(HTTPStatus.NOT_FOUND, ErrorCode.EVIDENCIA_NO_DISPONIBLE)
 
-CASO_EJEMPLO = {
-    "codigo": "MINSA-2026-000001",
-    "categoria": "reclamo",
-    "categoriaIa": "reclamo",
-    "confianzaIa": 58,
-    "etiquetas": [],
-    "prioridad": None,
-    "organismo": None,
-    "area": {"codigo": "HOSP-01", "nombre": "Hospital Uno"},
-    "establecimiento": {
-        "codigoRenipress": "1234",
-        "nombre": "Hospital Uno",
-        "nivelAtencion": "II",
-        "categoria": "II-1",
-    },
-    "responsable": None,
-    "estado": "clasificado",
-    "horasDesdeLlegada": 5,
-    "horasDesdeResolucion": None,
-    "revisadoPorHumano": False,
-    "corregida": False,
-    "plazo": {"tipo": "atencion", "estado": "en-plazo", "venceEn": "2026-11-23T12:00:00.000Z", "horasRestantes": 720},
-    "acciones": ["confirmar", "corregir"],
-}
 CONTEO_EJEMPLO = {"cantidad": 3, "conMas": False}
 RESPUESTAS_DE_EXITO: dict[str, dict[int | str, dict[str, object]]] = {
     "pagina": {
@@ -95,29 +72,7 @@ RESPUESTAS_DE_EXITO: dict[str, dict[int | str, dict[str, object]]] = {
         }
     },
     "detalle": {
-        HTTPStatus.OK: {
-            "description": "Detalle del caso.",
-            "content": json_example(
-                {
-                    **CASO_EJEMPLO,
-                    "descripcionDerivacion": None,
-                    "resolucion": None,
-                    "archivo": None,
-                    "reapertura": None,
-                    "descripcion": "Relato del caso.",
-                    "reclamante": "Anónimo",
-                    "evidencias": [],
-                    "historial": [
-                        {
-                            "titulo": "Recibido por WhatsApp",
-                            "detalle": "Registrado como incidencia.",
-                            "hora": "hace 5 h",
-                            "fecha": "2026-10-24T07:00:00.000Z",
-                        }
-                    ],
-                }
-            ),
-        }
+        HTTPStatus.OK: {"description": "Detalle del caso.", "content": json_example(DETALLE_EJEMPLO)},
     },
     "evidencia": {
         HTTPStatus.OK: {

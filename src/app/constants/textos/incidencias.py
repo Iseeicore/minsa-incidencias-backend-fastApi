@@ -1,3 +1,5 @@
+from app.enums.accion_incidencia import AccionIncidencia
+
 MENSAJE_CASO_NO_ENCONTRADO = "El caso solicitado no existe."
 MENSAJE_EVIDENCIA_NO_ENCONTRADA = "La evidencia solicitada no existe."
 MENSAJE_FECHA_INVALIDA = "La fecha debe ser un día real con el formato AAAA-MM-DD."
@@ -53,3 +55,36 @@ def texto_hace_horas(horas: int) -> str:
 
 def texto_hace_dias(dias: int) -> str:
     return f"hace {dias} d"
+
+
+MENSAJE_ACCION_REALIZADA = {
+    AccionIncidencia.CONFIRMAR: "Categoría confirmada.",
+    AccionIncidencia.CORREGIR: "Categoría corregida.",
+    AccionIncidencia.DERIVAR: "Caso derivado al área.",
+    AccionIncidencia.TOMAR: "Caso tomado en gestión.",
+    AccionIncidencia.RESOLVER: "Caso resuelto.",
+    AccionIncidencia.ARCHIVAR: "Caso archivado.",
+    AccionIncidencia.REABRIR: "Caso reabierto. Quedó en gestión.",
+}
+MENSAJE_ACCION_NO_PERMITIDA = {
+    AccionIncidencia.CONFIRMAR: "No puedes confirmar la categoría de este caso.",
+    AccionIncidencia.CORREGIR: "No puedes corregir la categoría de este caso.",
+    AccionIncidencia.DERIVAR: "No puedes derivar este caso.",
+    AccionIncidencia.TOMAR: "No puedes tomar este caso en gestión.",
+    AccionIncidencia.RESOLVER: "No puedes resolver este caso.",
+    AccionIncidencia.ARCHIVAR: "No puedes archivar este caso.",
+    AccionIncidencia.REABRIR: "No puedes reabrir este caso.",
+}
+MENSAJE_MISMA_CATEGORIA = "La nueva categoría es igual a la actual."
+MENSAJE_CATEGORIA_NO_PERMITIDA = "No puedes cambiar el caso a esa categoría."
+MENSAJE_SIN_DESTINO_DE_DERIVACION = "El caso no tiene un destino vinculado válido para derivarlo."
+MENSAJE_AREA_DESTINO_INVALIDA = "El área de destino no existe, está desactivada o no recibe este tipo de caso."
+MENSAJE_DESTINO_NO_VINCULADO = (
+    "Solo se puede derivar al establecimiento vinculado al caso; las denuncias por corrupción permanecen en OTRANS."
+)
+MENSAJE_DESCRIPCION_DERIVACION_INVALIDA = "Describe el motivo de la derivación con entre 10 y 2000 caracteres."
+MENSAJE_VALOR_NULO = "El valor no puede ser nulo."
+
+
+def mensaje_categoria_corregida_fuera_de_vista(etiqueta: str) -> str:
+    return f"Categoría corregida a {etiqueta}. El caso pasó al área correspondiente y ya no aparece en tu lista."
