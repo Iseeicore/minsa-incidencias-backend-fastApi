@@ -11,15 +11,18 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 5. Un método no permitido responde 404 `NOT_FOUND`, como el Node.
 6. Una falla de la base en una ruta de negocio responde 500 `INTERNAL_ERROR`, como el Node; el 503 `SERVICE_UNAVAILABLE` queda solo para `/salud/listo`. No existe 504.
 7. Un JSON mal formado responde 400 `VALIDATION_FAILED` sin `details`. Los `details` de un campo inválido usan la ruta del campo sin el prefijo `body`, `query` o `path`; los mensajes son los de Pydantic, no los de zod (diferencia aceptada).
-8. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
+8. La cookie de sesión es compatible byte a byte con `cookie-parser` y `res.cookie` de Express; los vectores salen del Node real (`tests/fixtures/vectores_node.json`, generados con la pila de `minsa-incidencias-backend`). Las cabeceras de seguridad son las de `helmet` 8.3.0, más `Cache-Control: no-store`; la política de contenido se omite en `/docs`, `/redoc` y `/openapi.json`.
+9. La sesión se resuelve por un puerto (`SessionResolver`). Hasta la Fase 3 el resolvedor de producción no reconoce ninguna sesión, así que toda cookie firmada y bien formada responde `INVALID_SESSION`.
+10. El limitador es por proceso (cubeta de fichas con el mismo cálculo del Node), con barrido cada 60 s. Con `TRUST_PROXY=true` la IP es el primer valor de `X-Forwarded-For`. Los límites de login (por correo y por IP) llegan con la Fase 3 porque leen el cuerpo. El control de conexiones de tiempo real (`iniciarVerificacion`/`liberar`) llega con la Fase 8.
+11. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
 
 ## Fases
 
 | Fase | Alcance | Estado |
 |---|---|---|
 | 0 | Preparación: contrato de referencia, base plantilla, sustitución del ejemplo por el contexto `catalogos` con `GET /v1/catalogos/plazos` | Hecha (PR #1) |
-| 1 | Contrato de errores del Node (`success`, 400 de validación, 404 por método, los 18 códigos) | Hecha en su rama |
-| 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Pendiente |
+| 1 | Contrato de errores del Node (`success`, 400 de validación, 404 por método, los 18 códigos) | Hecha (PR #2) |
+| 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Hecha en su rama |
 | 3 | `acceso` y `usuarios`, y `GET /areas` | Pendiente |
 | 4 | `incidencias`, lectura y evidencias | Pendiente |
 | 5 | `incidencias`, las siete acciones | Pendiente |

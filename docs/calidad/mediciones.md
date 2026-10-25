@@ -41,9 +41,13 @@ Todas las filas se midieron sobre el árbol del primer commit (`91735db`); esta 
 | 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Pruebas contra la base (PostgreSQL 16) | `uv run poe test-integration` | 3 de 3 | todas | Base creada desde la plantilla migrada con el esquema del bot |
 | 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Paridad con el contrato del Node | `uv run poe test` | `GET /v1/catalogos/plazos` válido contra `docs/contrato/v1.json` | todas |  |
 | 2026-10-24 | `d65e3e2` | Migración 0. Preparación | Secuencia completa | `uv run poe verificar` | código de salida 0 | 0 | 0 vulnerabilidades |
-| 2026-10-24 | sin commit | Migración 1. Errores | Cobertura de líneas y ramas, pruebas unitarias | `uv run poe test-coverage` | 98,05 % (610 pruebas) | 98 % |  |
-| 2026-10-24 | sin commit | Migración 1. Errores | Paridad del contrato de errores con `ErrorPayload` del Node | `uv run poe test` | 18 códigos, estados y campos idénticos | todas | El 401 sin sesión valida contra `v1.json` |
-| 2026-10-24 | sin commit | Migración 1. Errores | Secuencia completa | `uv run poe verificar` | código de salida 0 | 0 | 0 vulnerabilidades |
+| 2026-10-24 | `c5109e3` | Migración 1. Errores | Cobertura de líneas y ramas, pruebas unitarias | `uv run poe test-coverage` | 98,05 % (610 pruebas) | 98 % |  |
+| 2026-10-24 | `c5109e3` | Migración 1. Errores | Paridad del contrato de errores con `ErrorPayload` del Node | `uv run poe test` | 18 códigos, estados y campos idénticos | todas | El 401 sin sesión valida contra `v1.json` |
+| 2026-10-24 | `c5109e3` | Migración 1. Errores | Secuencia completa | `uv run poe verificar` | código de salida 0 | 0 | 0 vulnerabilidades |
+| 2026-10-24 | `d519a15` | Migración 2. Infraestructura | Cobertura de líneas y ramas, pruebas unitarias | `uv run poe test-coverage` | 98,32 % (872 pruebas) | 98 % |  |
+| 2026-10-24 | `d519a15` | Migración 2. Infraestructura | Paridad de cookie y cabeceras con el Node real | `uv run poe test` | 6 firmas, 10 lecturas y las cabeceras de helmet idénticas | todas | Vectores generados con `cookie-parser`, Express y `helmet` |
+| 2026-10-24 | `d519a15` | Migración 2. Infraestructura | Pruebas contra la base (PostgreSQL 16) | `uv run poe test-integration` | 7 de 7 | todas | Incluye `app.actor` visible dentro de la transacción |
+| 2026-10-24 | `d519a15` | Migración 2. Infraestructura | Secuencia completa | `uv run poe verificar` | código de salida 0 | 0 | 0 vulnerabilidades |
 | 2026-10-24 | `91735db` | 3. Auditoría contra el vault | Imagen reconstruida desde `git archive` y recorrido contra PostgreSQL 16 | `docker build --no-cache --pull` y `curl` | 201 con `Location`, 422 sin repetir lo enviado, 413 a 150 KB, cabeceras de seguridad, CORS solo del origen permitido, `/docs` 404 en producción, base caída: `/salud/listo` 503 y `/v1/notas` 503 en 15 ms | todo correcto | Prueba manual, no automatizada |
 | 2026-10-24 | `91735db` | 4. Carpetas puras y reglas del vault | Errores de tipos (`mypy --strict`, 92 archivos) | `uv run poe typecheck` | 0 | 0 | |
 | 2026-10-24 | `91735db` | 4. Carpetas puras y reglas del vault | Violaciones de `ruff` con todas las reglas | `uv run poe lint` | 0 | 0 | |
