@@ -19,6 +19,7 @@ from app.constants.http import (
 from app.constants.limits import CORS_MAX_AGE_SECONDS, JSON_BODY_LIMIT_BYTES
 from app.health.router import build_health_router
 from app.incidencias.adapters.http.router import build_incidencias_router
+from app.incidencias.adapters.http.router_de_acciones import build_acciones_router
 from app.shared.body_limit import BodyLimitMiddleware
 from app.shared.csrf import CsrfMiddleware
 from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
@@ -39,6 +40,7 @@ if TYPE_CHECKING:
     from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
     from app.incidencias.application.contar_incidencias import ContarIncidencias
     from app.incidencias.application.contenido_de_evidencia import ContenidoDeEvidencia
+    from app.incidencias.application.ejecutar_accion import EjecutarAccion
     from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
     from app.incidencias.application.listar_incidencias import ListarIncidencias
     from app.shared.clock import Clock
@@ -72,6 +74,7 @@ class Container:
     incidencias_por_vencer: IncidenciasPorVencer
     consultar_incidencia: ConsultarIncidencia
     contenido_de_evidencia: ContenidoDeEvidencia
+    ejecutar_accion: EjecutarAccion
     database_probe: DatabaseProbe
     clock: Clock
     session_resolver: SessionResolver
@@ -134,6 +137,7 @@ def create_v1_app(container: Container, *, docs_enabled: bool = False) -> FastAP
             container.contenido_de_evidencia,
         )
     )
+    app.include_router(build_acciones_router(container.ejecutar_accion))
     app.include_router(
         build_usuarios_router(
             container.listar_usuarios,

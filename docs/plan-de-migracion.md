@@ -26,6 +26,12 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 20. La imagen de una evidencia se entrega solo si la ruta es un data URI `data:image/{jpeg|png|webp};base64,` con base64 canónico; si no, responde 404 `EVIDENCIA_NO_DISPONIBLE`. Sus cabeceras (`Cache-Control: private, no-store`, CSP `default-src 'none'; sandbox`) reemplazan a las generales.
 21. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
 
+22. Cada acción sobre un caso es un objeto de la capa de aplicación (`Confirmar`, `Corregir`, `Derivar`, `Tomar`, `Resolver`, `Archivar`, `Reabrir`) que la capa HTTP arma desde un cuerpo ya validado. El caso de uso `EjecutarAccion` es el mismo para las siete: abre la transacción con el actor `usuario:{correo}`, bloquea el caso con `FOR UPDATE OF i`, comprueba que la acción esté entre las permitidas para los roles de la sesión y la aplica. Así no existe el 400 «faltan datos» del Node: un campo obligatorio ausente ya falló en el esquema de la petición.
+23. Lo que el Node valida dos veces (zod y servicio) aquí se valida en el esquema de la petición, con los mismos límites y mensajes de longitud (10 a 2000 o 4000 caracteres, recortados). Un campo opcional enviado como `null` responde 400, como en zod. Se conserva en el servicio la regla que el esquema no cubre: OTRANS que devuelve un caso a su origen exige la descripción de la derivación.
+24. Si tras la acción el caso ya no es visible para quien la hizo, se responde sin releerlo: una corrección a denuncia por corrupción responde `{codigo, enviadoAOtrans: true}`; cualquier otra corrección, el mensaje con la etiqueta de la categoría y `caso: null`; el resto, su mensaje y `caso: null`.
+25. Los disparadores de la base siguen siendo la última palabra: por ejemplo, reabrir un caso archivado por vigencia responde 409 con el mensaje de la regla, no 422 ni 403. Una prueba de integración lo fija contra el esquema del bot.
+26. Dos peticiones simultáneas sobre el mismo caso se serializan por el bloqueo de fila: la segunda ve el estado nuevo y recibe 403 «no puedes…». Lo comprueba una prueba con dos tareas `asyncio` sobre la misma base.
+
 ## Fases
 
 | Fase | Alcance | Estado |
@@ -34,8 +40,8 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 | 1 | Contrato de errores del Node (`success`, 400 de validación, 404 por método, los 18 códigos) | Hecha (PR #2) |
 | 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Hecha (PR #3) |
 | 3 | `acceso` y `usuarios`, y `GET /areas` | Hecha (PR #4) |
-| 4 | `incidencias`, lectura y evidencias | Hecha en su rama |
-| 5 | `incidencias`, las siete acciones | Pendiente |
+| 4 | `incidencias`, lectura y evidencias | Hecha (PR #5) |
+| 5 | `incidencias`, las siete acciones | Hecha en su rama |
 | 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Pendiente |
 | 7 | Archivador y clasificador | Pendiente |
 | 8 | Eventos en tiempo real (SSE con LISTEN/NOTIFY) | Pendiente |
