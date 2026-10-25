@@ -4,8 +4,5 @@ from app.errors.domain_error import DomainError
 
 
 class DatabaseTimeout(DomainError):
-    category = ErrorCategory.TIMEOUT
-    error_code = ErrorCode.DATABASE_TIMEOUT
-
-    def __init__(self) -> None:
-        super().__init__("El servicio tardó demasiado en responder")
+    category = ErrorCategory.INTERNAL
+    error_code = ErrorCode.INTERNAL_ERROR

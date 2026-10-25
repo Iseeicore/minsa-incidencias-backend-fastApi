@@ -7,9 +7,8 @@ from app.catalogos.adapters.http.schemas import PlazosDeCategoriasResponse
 from app.shared.auth_deps import require_session
 from app.shared.http_errors import (
     INTERNAL_RESPONSE,
+    RATE_LIMITED_RESPONSE,
     SIN_SESION_RESPONSE,
-    TIMEOUT_RESPONSE,
-    UNAVAILABLE_RESPONSE,
     json_example,
 )
 
@@ -42,8 +41,7 @@ def build_catalogos_router(listar_plazos: ListarPlazos) -> APIRouter:
         responses={
             **PLAZOS_RESPONSE,
             **SIN_SESION_RESPONSE,
-            **UNAVAILABLE_RESPONSE,
-            **TIMEOUT_RESPONSE,
+            **RATE_LIMITED_RESPONSE,
             **INTERNAL_RESPONSE,
         },
     )

@@ -9,14 +9,16 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 3. Cortes verticales con paridad: cada módulo se mide contra `v1.json` y contra las pruebas de integración del Node portadas.
 4. Fuera de la primera entrega: el cliente Ollama, `analizar-mensaje`, la comparación de variantes, los casos de IA e `ia-poc`. `GET /incidencias/:codigo/analisis-ia` sí se migra: lee la base y datos estáticos de normas.
 5. Un método no permitido responde 404 `NOT_FOUND`, como el Node.
-6. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
+6. Una falla de la base en una ruta de negocio responde 500 `INTERNAL_ERROR`, como el Node; el 503 `SERVICE_UNAVAILABLE` queda solo para `/salud/listo`. No existe 504.
+7. Un JSON mal formado responde 400 `VALIDATION_FAILED` sin `details`. Los `details` de un campo inválido usan la ruta del campo sin el prefijo `body`, `query` o `path`; los mensajes son los de Pydantic, no los de zod (diferencia aceptada).
+8. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
 
 ## Fases
 
 | Fase | Alcance | Estado |
 |---|---|---|
-| 0 | Preparación: contrato de referencia, base plantilla, sustitución del ejemplo por el contexto `catalogos` con `GET /v1/catalogos/plazos` | Hecha en su rama |
-| 1 | Contrato de errores del Node (`success`, 400 de validación, 404 por método, los 18 códigos) | Pendiente |
+| 0 | Preparación: contrato de referencia, base plantilla, sustitución del ejemplo por el contexto `catalogos` con `GET /v1/catalogos/plazos` | Hecha (PR #1) |
+| 1 | Contrato de errores del Node (`success`, 400 de validación, 404 por método, los 18 códigos) | Hecha en su rama |
 | 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Pendiente |
 | 3 | `acceso` y `usuarios`, y `GET /areas` | Pendiente |
 | 4 | `incidencias`, lectura y evidencias | Pendiente |
