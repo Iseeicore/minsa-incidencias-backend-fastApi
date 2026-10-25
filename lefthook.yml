@@ -17,7 +17,7 @@ pre-commit:
 pre-push:
   fail_fast: true
   commands:
-    verificar:
-      run: uv run poe verificar
     integracion:
       run: uv run poe test-integration
+    verificar:
+      run: uv run poe verificar

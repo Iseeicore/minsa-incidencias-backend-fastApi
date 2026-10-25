@@ -41,3 +41,10 @@ def test_cada_comando_de_los_hooks_es_una_tarea_de_poe_o_una_herramienta_sin_arg
         assert coincidencia["tarea"] in TAREAS_DE_POE
     else:
         assert COMANDOS_PERMITIDOS_SIN_POE.match(comando)
+
+
+def test_el_pre_push_corre_primero_la_comprobacion_barata_de_la_base() -> None:
+    texto = (RAIZ / "lefthook.yml").read_text(encoding="utf-8")
+    bloque = texto.split("pre-push:", 1)[1]
+
+    assert bloque.index("integracion:") < bloque.index("verificar:")
