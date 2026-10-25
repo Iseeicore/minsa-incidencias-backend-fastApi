@@ -152,7 +152,9 @@ def domain_error_response(
     request: Request, clock: Clock, error: DomainError, headers: dict[str, str] | None = None
 ) -> JSONResponse:
     status = HTTP_STATUS_BY_CATEGORY[error.category]
-    return _response(request, clock, ErrorPayload(status, error.error_code, error.message, error.details, headers))
+    return _response(
+        request, clock, ErrorPayload(status, error.error_code, error.message, error.details, headers or error.headers)
+    )
 
 
 def register_error_handlers(app: FastAPI, clock: Clock) -> None:
@@ -165,7 +167,7 @@ def register_error_handlers(app: FastAPI, clock: Clock) -> None:
                 "internal_domain_error", path=request.url.path, error_type=type(error).__name__, exc_info=error
             )
             message = DEFAULT_ERROR_MESSAGES[ErrorCode.INTERNAL_ERROR]
-        return _response(request, clock, ErrorPayload(status, error.error_code, message, error.details))
+        return _response(request, clock, ErrorPayload(status, error.error_code, message, error.details, error.headers))
 
     @app.exception_handler(RequestValidationError)
     async def handle_request_validation(request: Request, error: RequestValidationError) -> JSONResponse:

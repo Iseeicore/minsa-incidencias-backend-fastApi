@@ -1,7 +1,9 @@
 from http import HTTPStatus
 
 import pytest
+from starlette.types import Message, Receive, Scope, Send
 
+from app.shared.security_headers import SecurityHeadersMiddleware
 from tests.helpers.app_factory import un_cliente, un_contenedor
 from tests.helpers.fakes import RaisingPlazoRepository
 from tests.helpers.vectores import vectores_del_nodo
@@ -61,3 +63,20 @@ async def test_la_documentacion_no_lleva_la_politica_de_contenido(ruta: str) -> 
 
     assert "content-security-policy" not in respuesta.headers
     assert respuesta.headers["x-content-type-options"] == "nosniff"
+
+
+async def test_un_alcance_que_no_es_http_pasa_sin_tocar_nada() -> None:
+    alcances: list[str] = []
+
+    async def app(scope: Scope, receive: Receive, send: Send) -> None:  # noqa: ARG001
+        alcances.append(scope["type"])
+
+    async def receive() -> Message:
+        return {"type": "lifespan.startup"}
+
+    async def send(message: Message) -> None:
+        raise AssertionError(message)
+
+    await SecurityHeadersMiddleware(app)({"type": "lifespan"}, receive, send)
+
+    assert alcances == ["lifespan"]

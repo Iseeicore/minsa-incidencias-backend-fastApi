@@ -45,3 +45,5 @@ VALIDATION_LOCATIONS = frozenset({"body", "query", "path", "header", "cookie"})
 JSON_INVALID_ERROR_TYPE = "json_invalid"
 EXAMPLE_PATH = "/recurso"
 SESSION_STATE_KEY = "sesion"
+DEFAULT_VALIDATION_STATUS = "422"
+DEFAULT_VALIDATION_SCHEMAS = ("HTTPValidationError", "ValidationError")

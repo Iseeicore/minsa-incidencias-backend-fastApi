@@ -11,7 +11,8 @@ type Spec = dict[str, Any]
 METODOS = {"get", "post", "put", "patch", "delete"}
 ESQUEMA_DE_ERROR = "#/components/schemas/ErrorBody"
 ESQUEMA_DE_SALUD = "#/components/schemas/HealthResponse"
-ESTADOS_DE_ERROR = {"404", "405", "413", "422", "500", "503", "504"}
+ESTADOS_DE_ERROR = {"400", "401", "403", "404", "409", "413", "422", "429", "500", "503"}
+SIN_CABECERA_LOCATION = {"crearUsuario": "el contrato del Node devuelve el usuario creado en el cuerpo"}
 
 
 def _especificaciones() -> dict[str, Spec]:
@@ -60,13 +61,15 @@ def test_cada_error_documentado_usa_el_formato_unico(operacion: Spec) -> None:
 
 @pytest.mark.parametrize("operacion", [operacion for _, _, operacion in OPERACIONES], ids=IDS)
 def test_un_201_declara_la_cabecera_location(operacion: Spec) -> None:
-    if "201" in operacion["responses"]:
+    if "201" in operacion["responses"] and operacion["operationId"] not in SIN_CABECERA_LOCATION:
         assert "Location" in operacion["responses"]["201"]["headers"]
 
 
 @pytest.mark.parametrize("operacion", [operacion for _, _, operacion in OPERACIONES], ids=IDS)
 def test_cada_exito_y_cada_error_traen_ejemplo(operacion: Spec) -> None:
     for estado, respuesta in operacion["responses"].items():
+        if estado == "204":
+            continue
         contenido = respuesta["content"]["application/json"]
         assert "example" in contenido or "examples" in contenido, estado
 

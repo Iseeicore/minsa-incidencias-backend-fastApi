@@ -1,10 +1,18 @@
-from fastapi import Request  # noqa: TC002
+from typing import TYPE_CHECKING, Annotated
+
+from fastapi import Depends, Request
 
 from app.constants.http import SESSION_STATE_KEY
 from app.constants.sesion import SESSION_INVALID_STATE_KEY
 from app.errors.sesion_invalida import SesionInvalida
+from app.errors.sin_permiso import SinPermiso
 from app.errors.sin_sesion import SinSesion
 from app.shared.sesion import SesionActual
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from app.enums.vista_codigo import VistaCodigo
 
 
 def require_session(request: Request) -> SesionActual:
@@ -14,3 +22,12 @@ def require_session(request: Request) -> SesionActual:
     if getattr(request.state, SESSION_INVALID_STATE_KEY, False):
         raise SesionInvalida
     raise SinSesion
+
+
+def require_vista(vista: VistaCodigo) -> Callable[[SesionActual], SesionActual]:
+    def dependency(sesion: Annotated[SesionActual, Depends(require_session)]) -> SesionActual:
+        if vista not in sesion.vistas:
+            raise SinPermiso
+        return sesion
+
+    return dependency

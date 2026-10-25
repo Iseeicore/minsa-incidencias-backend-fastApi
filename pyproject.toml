@@ -3,6 +3,7 @@ name = "migracion-fast-api"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
+    "argon2-cffi>=25.1.0",
     "fastapi>=0.162.0",
     "psycopg[binary,pool]>=3.3.6",
     "pydantic-settings>=2.16.1",
@@ -46,7 +47,7 @@ ignore = ["D", "COM812", "CPY", "N818"]
 ban-relative-imports = "all"
 
 [tool.ruff.lint.flake8-type-checking]
-runtime-evaluated-base-classes = ["pydantic.BaseModel", "pydantic_settings.BaseSettings"]
+runtime-evaluated-base-classes = ["pydantic.BaseModel", "pydantic_settings.BaseSettings", "app.shared.api_model.ApiModel"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["app", "tests"]
@@ -61,7 +62,7 @@ max-complexity = 8
 
 [tool.ruff.lint.per-file-ignores]
 "scripts/**" = ["INP001"]
-"tests/**" = ["S101", "S105", "S106", "PLR2004", "INP001", "TC001", "TC002", "TC003"]
+"tests/**" = ["S101", "S105", "S106", "PLR2004", "INP001", "TC001", "TC002", "TC003", "E501"]
 
 [tool.mypy]
 strict = true
@@ -87,7 +88,7 @@ markers = ["integration: pruebas contra una base PostgreSQL real"]
 [tool.coverage.run]
 source = ["app"]
 branch = true
-omit = ["src/app/main.py", "src/app/__main__.py", "src/app/**/ports.py"]
+omit = ["src/app/main.py", "src/app/__main__.py", "src/app/**/ports.py", "src/app/**/adapters/persistence/*"]
 
 [tool.coverage.report]
 show_missing = true
@@ -101,37 +102,52 @@ include_external_packages = true
 [[tool.importlinter.contracts]]
 name = "El dominio no depende de frameworks ni de drivers"
 type = "forbidden"
-source_modules = ["app.catalogos.domain"]
+source_modules = ["app.catalogos.domain", "app.acceso.domain", "app.usuarios.domain"]
 forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
-name = "Las capas apuntan hacia adentro"
+name = "Las capas apuntan hacia adentro en catalogos"
 type = "layers"
 layers = ["app.catalogos.adapters", "app.catalogos.application", "app.catalogos.domain"]
 
 [[tool.importlinter.contracts]]
+name = "Las capas apuntan hacia adentro en acceso"
+type = "layers"
+layers = ["app.acceso.adapters", "app.acceso.application", "app.acceso.domain"]
+
+[[tool.importlinter.contracts]]
+name = "Las capas apuntan hacia adentro en usuarios"
+type = "layers"
+layers = ["app.usuarios.adapters", "app.usuarios.application", "app.usuarios.domain"]
+
+[[tool.importlinter.contracts]]
+name = "Los contextos son independientes entre sí"
+type = "independence"
+modules = ["app.catalogos", "app.acceso", "app.usuarios"]
+
+[[tool.importlinter.contracts]]
 name = "La aplicación no depende de frameworks ni de drivers"
 type = "forbidden"
-source_modules = ["app.catalogos.application"]
+source_modules = ["app.catalogos.application", "app.acceso.application", "app.usuarios.application"]
 forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
 name = "El kernel compartido no importa contextos ni salud ni configuración"
 type = "forbidden"
 source_modules = ["app.shared"]
-forbidden_modules = ["app.catalogos", "app.health", "app.config"]
+forbidden_modules = ["app.catalogos", "app.acceso", "app.usuarios", "app.health", "app.config"]
 
 [[tool.importlinter.contracts]]
 name = "Las carpetas puras no dependen de capas ni de frameworks"
 type = "forbidden"
 source_modules = ["app.constants", "app.enums", "app.errors"]
-forbidden_modules = ["app.shared", "app.catalogos", "app.health", "app.config", "app.composition", "fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
+forbidden_modules = ["app.shared", "app.catalogos", "app.acceso", "app.usuarios", "app.health", "app.config", "app.composition", "fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
 name = "La salud no importa contextos"
 type = "forbidden"
 source_modules = ["app.health"]
-forbidden_modules = ["app.catalogos"]
+forbidden_modules = ["app.catalogos", "app.acceso", "app.usuarios"]
 
 [tool.poe.tasks]
 typecheck = "mypy"

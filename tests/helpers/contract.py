@@ -1,5 +1,6 @@
 import json
 from dataclasses import dataclass, field
+from functools import cache
 from pathlib import Path
 from urllib.parse import parse_qsl
 
@@ -74,6 +75,7 @@ def openapi_v1(container: Container) -> OpenAPI:
     return OpenAPI.from_dict(create_v1_app(container).openapi())
 
 
+@cache
 def openapi_del_nodo() -> OpenAPI:
     return OpenAPI.from_dict(json.loads(CONTRATO_DEL_NODO.read_text(encoding="utf-8")))
 

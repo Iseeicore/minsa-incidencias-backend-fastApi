@@ -28,7 +28,16 @@ async def test_la_especificacion_v1_declara_la_version_del_contrato_y_su_prefijo
 
     assert especificacion["info"]["version"] == "1.0.0"
     assert especificacion["servers"] == [{"url": "/v1"}]
-    assert sorted(especificacion["paths"]) == ["/catalogos/plazos"]
+    assert sorted(especificacion["paths"]) == [
+        "/areas",
+        "/auth/login",
+        "/auth/logout",
+        "/auth/me",
+        "/catalogos/plazos",
+        "/usuarios",
+        "/usuarios/{id}",
+        "/usuarios/{id}/restablecer-clave",
+    ]
 
 
 ORIGEN_PERMITIDO = "https://app.minsa.gob.pe"

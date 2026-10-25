@@ -7,3 +7,5 @@ CATEGORIA_API: dict[CategoriaIncidencia, CategoriaApi] = {
     CategoriaIncidencia.RECLAMO: CategoriaApi.RECLAMO,
     CategoriaIncidencia.OTRO: CategoriaApi.OTRO,
 }
+AREA_CODIGO_LONGITUD_MAXIMA = 50
+TEXTO_BUSQUEDA_MAXIMO = 100
