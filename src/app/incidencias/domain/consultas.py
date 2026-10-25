@@ -48,3 +48,17 @@ class VisibilidadOperativa:
     roles: tuple[str, ...]
     ver_sin_categoria: bool
     area_id: int | None
+
+
+@dataclass(frozen=True, slots=True)
+class VisibilidadDeDerivaciones:
+    ver_sin_categoria: bool = True
+
+
+@dataclass(frozen=True, slots=True)
+class VisibilidadDeIpress:
+    establecimiento_id: int
+    ver_sin_categoria: bool = True
+
+
+type Visibilidad = VisibilidadOperativa | VisibilidadDeDerivaciones | VisibilidadDeIpress

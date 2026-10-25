@@ -12,6 +12,7 @@ from app.shared.sesion import SesionActual
 if TYPE_CHECKING:
     from collections.abc import Callable
 
+    from app.enums.rol_codigo import RolCodigo
     from app.enums.vista_codigo import VistaCodigo
 
 
@@ -27,6 +28,24 @@ def require_session(request: Request) -> SesionActual:
 def require_vista(vista: VistaCodigo) -> Callable[[SesionActual], SesionActual]:
     def dependency(sesion: Annotated[SesionActual, Depends(require_session)]) -> SesionActual:
         if vista not in sesion.vistas:
+            raise SinPermiso
+        return sesion
+
+    return dependency
+
+
+def require_vista_y_rol(vista: VistaCodigo, *roles: RolCodigo) -> Callable[[SesionActual], SesionActual]:
+    def dependency(sesion: Annotated[SesionActual, Depends(require_session)]) -> SesionActual:
+        if vista not in sesion.vistas or not any(rol in sesion.roles for rol in roles):
+            raise SinPermiso
+        return sesion
+
+    return dependency
+
+
+def require_rol(*roles: RolCodigo) -> Callable[[SesionActual], SesionActual]:
+    def dependency(sesion: Annotated[SesionActual, Depends(require_session)]) -> SesionActual:
+        if not any(rol in sesion.roles for rol in roles):
             raise SinPermiso
         return sesion
 

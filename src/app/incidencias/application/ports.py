@@ -8,17 +8,27 @@ if TYPE_CHECKING:
     from app.enums.motivo_archivo import MotivoArchivo
     from app.enums.resultado_resolucion import ResultadoResolucion
     from app.enums.tipo_area import TipoArea
+    from app.incidencias.domain.analisis import FilaAnalisis
     from app.incidencias.domain.caso_consultado import CasoConsultado, ConteoPorVencer, EvidenciaConsultada
-    from app.incidencias.domain.consultas import FiltrosCasos, VisibilidadOperativa
+    from app.incidencias.domain.consultas import FiltrosCasos, Visibilidad, VisibilidadOperativa
+    from app.incidencias.domain.cubos_de_evolucion import DiaDeEvolucion
     from app.incidencias.domain.cursores import PosicionDeListado, PosicionPorVencer
+    from app.incidencias.domain.derivaciones import (
+        ConsultaDeDerivaciones,
+        ConteosDeDerivaciones,
+        DerivacionConsultada,
+        FiltrosDeDerivaciones,
+    )
     from app.incidencias.domain.fila_historial import FilaHistorial
+    from app.incidencias.domain.indicadores import FilaDistribucion, FilaResumen
+    from app.incidencias.domain.ipress import ConsultaDeIpress, IpressConsultada, IpressListada
     from app.shared.permisos import ReglaDeAccion
 
 
 class IncidenciaReader(Protocol):
     async def listar(
         self,
-        visible: VisibilidadOperativa,
+        visible: Visibilidad,
         filtros: FiltrosCasos,
         limite: int,
         despues_de: PosicionDeListado | None,
@@ -26,19 +36,19 @@ class IncidenciaReader(Protocol):
 
     async def listar_proximos_a_vencer(
         self,
-        visible: VisibilidadOperativa,
+        visible: Visibilidad,
         filtros: FiltrosCasos,
         limite: int,
         despues_de: PosicionPorVencer | None,
     ) -> list[CasoConsultado]: ...
 
-    async def contar_acotado(self, visible: VisibilidadOperativa, filtros: FiltrosCasos, tope: int) -> int: ...
+    async def contar_acotado(self, visible: Visibilidad, filtros: FiltrosCasos, tope: int) -> int: ...
 
     async def contar_por_estado(
-        self, visible: VisibilidadOperativa, filtros: FiltrosCasos, tope: int
+        self, visible: Visibilidad, filtros: FiltrosCasos, tope: int
     ) -> dict[EstadoIncidencia, int]: ...
 
-    async def buscar_por_codigo(self, codigo: str, visible: VisibilidadOperativa) -> CasoConsultado | None: ...
+    async def buscar_por_codigo(self, codigo: str, visible: Visibilidad) -> CasoConsultado | None: ...
 
     async def evidencias(self, incidencia_id: str) -> list[EvidenciaConsultada]: ...
 
@@ -47,16 +57,42 @@ class IncidenciaReader(Protocol):
     async def historial(self, incidencia_id: str) -> list[FilaHistorial]: ...
 
     async def contar_por_vencer(
-        self, visible: VisibilidadOperativa, aviso_horas: int, pendientes: tuple[ReglaDeAccion, ...] | None
+        self, visible: Visibilidad, aviso_horas: int, pendientes: tuple[ReglaDeAccion, ...] | None
     ) -> ConteoPorVencer: ...
 
     async def listar_por_vencer(
         self,
-        visible: VisibilidadOperativa,
+        visible: Visibilidad,
         aviso_horas: int,
         limite: int,
         pendientes: tuple[ReglaDeAccion, ...] | None,
     ) -> list[CasoConsultado]: ...
+
+
+class DerivacionReader(Protocol):
+    async def listar(self, consulta: ConsultaDeDerivaciones, limite: int) -> list[DerivacionConsultada]: ...
+
+    async def contar(self, filtros: FiltrosDeDerivaciones) -> ConteosDeDerivaciones: ...
+
+    async def buscar_por_codigo(self, codigo: str) -> DerivacionConsultada | None: ...
+
+
+class AnalisisReader(Protocol):
+    async def buscar(self, incidencia_id: str) -> FilaAnalisis | None: ...
+
+
+class IndicadoresReader(Protocol):
+    async def resumen(self, visible: Visibilidad, dias: int, aviso_horas: int) -> FilaResumen: ...
+
+    async def distribucion(self, visible: Visibilidad) -> list[FilaDistribucion]: ...
+
+    async def evolucion_diaria(self, visible: Visibilidad, dias: int) -> list[DiaDeEvolucion]: ...
+
+
+class IpressFinder(Protocol):
+    async def buscar(self, renipress: str) -> IpressConsultada | None: ...
+
+    async def listar(self, consulta: ConsultaDeIpress, limite: int) -> list[IpressListada]: ...
 
 
 class IncidenciaTransaction(Protocol):

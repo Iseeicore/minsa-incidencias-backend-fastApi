@@ -40,3 +40,87 @@ DETALLE_EJEMPLO = {
         }
     ],
 }
+DERIVACION_EJEMPLO = {
+    "id": "4821",
+    "codigoCaso": "MINSA-2026-000001",
+    "fechaDerivacion": "2026-01-15T14:30:00.000Z",
+    "origen": {"codigo": "OTRANS", "nombre": "Oficina de Transparencia Ejemplo"},
+    "destino": {"codigo": "EESS-0001", "nombre": "Centro de Salud Ejemplo", "codigoRenipress": "1"},
+    "derivadoPor": "Lucía Ramos Prueba",
+    "descripcion": "Se devuelve al establecimiento porque corresponde a un reclamo.",
+    "categoria": "reclamo",
+    "estado": "derivado",
+    "motivoArchivo": None,
+}
+INDICADORES_EJEMPLO = {
+    "periodo": "7d",
+    "generadoEn": "2026-10-24T12:00:00.000Z",
+    "alcance": {
+        "tipo": "AREA",
+        "area": {"codigo": "EESS-0001", "nombre": "Centro de Salud Ejemplo", "tipo": "ESTABLECIMIENTO"},
+    },
+    "tarjetas": [
+        {"codigo": "recibidos", "valor": 12, "anterior": 9},
+        {"codigo": "pendientes", "valor": 4, "anterior": None},
+    ],
+    "porCategoria": [{"categoria": "reclamo", "cantidad": 7}],
+    "porEstado": [{"estado": "registrado", "cantidad": 4}],
+    "evolucion": [{"desde": "2026-01-09", "recibidos": 2, "resueltos": 1}],
+    "tiempoPromedioHoras": 18.5,
+}
+RESUMEN_DE_IPRESS_EJEMPLO = {
+    "total": 5,
+    "abiertos": 2,
+    "enGestion": 1,
+    "resueltos": 2,
+    "archivados": 1,
+    "porCategoria": [{"categoria": "reclamo", "cantidad": 4}],
+}
+IPRESS_EJEMPLO = {
+    "id": 3,
+    "codigo": "EESS-0001",
+    "nombre": "Centro de Salud Ejemplo",
+    "tipoArea": "ESTABLECIMIENTO",
+    "establecimiento": {"codigoRenipress": "1", "nivelAtencion": "I", "categoria": "I-3"},
+}
+ANALISIS_EJEMPLO = {
+    "codigo": "MINSA-2026-000001",
+    "categoriaIa": "denuncia-corrupcion",
+    "confianzaIa": 82,
+    "versionClasificador": "coincidencias-v1",
+    "versionReglas": "reglas-corrupcion-v1.3",
+    "puntaje": 5,
+    "motivoDeEscritura": "REGLAS",
+    "propuestaDelAnalisis": "denuncia-corrupcion",
+    "requiereRevisionHumana": True,
+    "escalarAOtrans": False,
+    "explicacion": "El relato describe un pedido de dinero a cambio de la atención.",
+    "senales": [{"frase": "me pidió plata", "tipo": "FUERTE", "peso": 3}],
+    "supuestos": [
+        {
+            "fragmentoId": "anexo-c-cobro",
+            "grupo": "SUPUESTO",
+            "referencia": "Anexo C",
+            "titulo": "Cobro indebido",
+            "texto": None,
+            "senalesQueLaMotivan": ["me pidió plata"],
+        }
+    ],
+    "procedimiento": [],
+    "sinSupuestoIdentificado": False,
+    "etiquetaNormas": "Referencia orientativa",
+    "versionNormas": "normas-v1",
+    "transcripcionAnexoCCotejada": True,
+    "requisitosFaltantes": [],
+    "fichaDerivacion": {
+        "codigoEntidad": "sis",
+        "contactosDisponibles": ["OCI"],
+        "destinoSiTitular": None,
+        "aplicaAlTitular": False,
+    },
+    "cargoMencionado": "jefa",
+    "nombreMencionado": None,
+    "areaMencionada": None,
+    "modelo": {"variante": None, "degradado": False, "pesoIa": None},
+    "fechaAnalisis": "2026-10-24T12:00:00.000Z",
+}

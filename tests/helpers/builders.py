@@ -9,6 +9,7 @@ from app.enums.categoria_incidencia import CategoriaIncidencia
 from app.enums.estado_incidencia import EstadoIncidencia
 from app.enums.tipo_area import TipoArea
 from app.incidencias.domain.caso_consultado import CasoConsultado, EvidenciaConsultada
+from app.incidencias.domain.derivaciones import DerivacionConsultada
 from app.shared.http_security import HttpSecurity
 from app.shared.permisos import vistas_de_roles
 from app.shared.rate_limit import RateLimitPolicies
@@ -213,3 +214,22 @@ def una_evidencia(  # noqa: PLR0913
         verificada=verificada,
         contenido_disponible=contenido_disponible,
     )
+
+
+def una_derivacion_consultada(**cambios: Any) -> DerivacionConsultada:  # noqa: ANN401
+    base: dict[str, Any] = {
+        "id": "4821",
+        "codigo_caso": "MINSA-2026-000001",
+        "fecha_derivacion": datetime(2026, 10, 24, 9, 30, 15, 123_456, tzinfo=UTC),
+        "origen_codigo": "OTRANS",
+        "origen_nombre": "Oficina de Transparencia",
+        "destino_codigo": "EESS-0001",
+        "destino_nombre": "Centro de Salud Uno",
+        "destino_renipress": "1",
+        "derivado_por": "Lucía Ramos",
+        "descripcion": "Corresponde a un reclamo.",
+        "categoria": CategoriaIncidencia.RECLAMO,
+        "estado": EstadoIncidencia.DERIVADO,
+        "motivo_archivo": None,
+    }
+    return DerivacionConsultada(**{**base, **cambios})

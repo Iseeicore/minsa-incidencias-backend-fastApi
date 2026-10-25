@@ -4,12 +4,12 @@ from typing import TYPE_CHECKING
 from app.constants.incidencias import CONTEO_TOPE, ESTADO_API
 from app.enums.estado_incidencia import EstadoIncidencia
 from app.incidencias.application.filtros import filtros_de, sin_estado_ni_motivo
-from app.incidencias.application.visibilidad import visibilidad_de
+from app.incidencias.application.visibilidad import visibilidad_o_de
 from app.incidencias.domain.casos import ConteoAcotado, ConteosDeCasos
 
 if TYPE_CHECKING:
     from app.incidencias.application.ports import IncidenciaReader
-    from app.incidencias.domain.consultas import FiltrosConsulta
+    from app.incidencias.domain.consultas import FiltrosConsulta, Visibilidad
     from app.incidencias.domain.plazo import PlazosConfigurados
     from app.shared.sesion import SesionActual
 
@@ -24,8 +24,10 @@ class ContarIncidencias:
         self._plazos = plazos
         self._tope = tope
 
-    async def execute(self, sesion: SesionActual, consulta: FiltrosConsulta) -> ConteosDeCasos:
-        visible = visibilidad_de(sesion)
+    async def execute(
+        self, sesion: SesionActual, consulta: FiltrosConsulta, visibilidad: Visibilidad | None = None
+    ) -> ConteosDeCasos:
+        visible = visibilidad_o_de(sesion, visibilidad)
         filtros = filtros_de(consulta, self._plazos)
         acota_pestana = filtros.estado is not None or filtros.motivo_archivo is not None
         por_estado, total = await asyncio.gather(

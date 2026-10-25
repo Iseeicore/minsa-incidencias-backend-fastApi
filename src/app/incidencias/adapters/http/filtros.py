@@ -1,8 +1,10 @@
-from typing import Annotated
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Annotated
 
 from fastapi import Query
 from pydantic import StringConstraints
 
+from app.constants.consulta_ipress import CONSULTA_IPRESS_LIMITE_POR_DEFECTO
 from app.constants.incidencias import (
     CURSOR_LONGITUD_MAXIMA,
     ESTADO_DESDE_API,
@@ -29,6 +31,9 @@ from app.incidencias.domain.consultas import ConsultaListado, FiltrosConsulta
 from app.incidencias.domain.cursores import decodificar_cursor, decodificar_cursor_por_vencer
 from app.incidencias.domain.rango_fechas import dia_de, dias_del_rango
 from app.shared.codigo_renipress import codigo_renipress_canonico
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 Texto = Annotated[str, StringConstraints(strip_whitespace=True, max_length=TEXTO_BUSQUEDA_MAXIMO)]
 Recortado = Annotated[str, StringConstraints(strip_whitespace=True)]
@@ -73,6 +78,24 @@ def _validar_plazo(filtros: FiltrosConsulta, errores: list[Detalle]) -> None:
         errores.append({"path": "plazo", "message": MENSAJE_PLAZO_SOLO_CASOS_ABIERTOS})
 
 
+@dataclass(frozen=True, slots=True)
+class CamposComunes:
+    texto: str | None
+    establecimiento: str | None
+    desde: str | None
+    hasta: str | None
+
+
+def campos_comunes(
+    texto: str | None, establecimiento: str | None, desde: str | None, hasta: str | None, errores: list[Detalle]
+) -> CamposComunes:
+    dia_desde = _dia(desde, "desde", errores)
+    dia_hasta = _dia(hasta, "hasta", errores)
+    campos = CamposComunes(texto or None, _establecimiento(establecimiento, errores), dia_desde, dia_hasta)
+    _validar_rango(dia_desde, dia_hasta, errores)
+    return campos
+
+
 def armar_filtros(  # noqa: PLR0913, PLR0917
     estado: EstadoApi | None,
     motivo_archivo: MotivoArchivo | None,
@@ -84,24 +107,22 @@ def armar_filtros(  # noqa: PLR0913, PLR0917
     plazo: PlazoFiltro | None,
     errores: list[Detalle],
 ) -> FiltrosConsulta:
-    dia_desde = _dia(desde, "desde", errores)
-    dia_hasta = _dia(hasta, "hasta", errores)
+    campos = campos_comunes(texto, establecimiento, desde, hasta, errores)
     filtros = FiltrosConsulta(
         estado=estado,
         categoria=categoria,
-        texto=texto or None,
-        establecimiento=_establecimiento(establecimiento, errores),
+        texto=campos.texto,
+        establecimiento=campos.establecimiento,
         motivo_archivo=motivo_archivo,
-        desde=dia_desde,
-        hasta=dia_hasta,
+        desde=campos.desde,
+        hasta=campos.hasta,
         por_vencer=plazo is not None,
     )
-    _validar_rango(dia_desde, dia_hasta, errores)
     _validar_plazo(filtros, errores)
     return filtros
 
 
-def _fallar_si_hay_errores(errores: list[Detalle]) -> None:
+def fallar_si_hay_errores(errores: list[Detalle]) -> None:
     if errores:
         raise DatosInvalidos(details=errores)
 
@@ -118,32 +139,39 @@ def filtros_de_conteos(  # noqa: PLR0913, PLR0917
 ) -> FiltrosConsulta:
     errores: list[Detalle] = []
     filtros = armar_filtros(estado, motivo_archivo, categoria, texto, establecimiento, desde, hasta, plazo, errores)
-    _fallar_si_hay_errores(errores)
+    fallar_si_hay_errores(errores)
     return filtros
 
 
-def consulta_de_listado(  # noqa: PLR0913, PLR0917
-    estado: Annotated[EstadoApi | None, Query()] = None,
-    motivo_archivo: Annotated[MotivoArchivo | None, Query(alias="motivoArchivo")] = None,
-    categoria: Annotated[CategoriaFiltro | None, Query()] = None,
-    texto: Annotated[Texto | None, Query()] = None,
-    establecimiento: Annotated[Recortado | None, Query()] = None,
-    desde: Annotated[Recortado | None, Query()] = None,
-    hasta: Annotated[Recortado | None, Query()] = None,
-    plazo: Annotated[PlazoFiltro | None, Query()] = None,
-    limite: Annotated[int, Query(ge=1, le=LISTADO_LIMITE_MAXIMO)] = LISTADO_LIMITE_POR_DEFECTO,
-    cursor: Annotated[str | None, Query(max_length=CURSOR_LONGITUD_MAXIMA)] = None,
-) -> ConsultaListado:
-    errores: list[Detalle] = []
-    filtros = armar_filtros(estado, motivo_archivo, categoria, texto, establecimiento, desde, hasta, plazo, errores)
-    despues_de = None
-    despues_de_por_vencer = None
-    if cursor:
-        despues_de_por_vencer = decodificar_cursor_por_vencer(cursor) if filtros.por_vencer else None
-        despues_de = None if filtros.por_vencer else decodificar_cursor(cursor)
-        if despues_de is None and despues_de_por_vencer is None:
-            errores.append({"path": "cursor", "message": MENSAJE_CURSOR_INVALIDO})
-    _fallar_si_hay_errores(errores)
-    return ConsultaListado(
-        limite=limite, filtros=filtros, despues_de=despues_de, despues_de_por_vencer=despues_de_por_vencer
-    )
+def crear_consulta_de_listado(limite_por_defecto: int) -> Callable[..., ConsultaListado]:
+    def consulta_de_listado(  # noqa: PLR0913, PLR0917
+        estado: Annotated[EstadoApi | None, Query()] = None,
+        motivo_archivo: Annotated[MotivoArchivo | None, Query(alias="motivoArchivo")] = None,
+        categoria: Annotated[CategoriaFiltro | None, Query()] = None,
+        texto: Annotated[Texto | None, Query()] = None,
+        establecimiento: Annotated[Recortado | None, Query()] = None,
+        desde: Annotated[Recortado | None, Query()] = None,
+        hasta: Annotated[Recortado | None, Query()] = None,
+        plazo: Annotated[PlazoFiltro | None, Query()] = None,
+        limite: Annotated[int, Query(ge=1, le=LISTADO_LIMITE_MAXIMO)] = limite_por_defecto,
+        cursor: Annotated[str | None, Query(max_length=CURSOR_LONGITUD_MAXIMA)] = None,
+    ) -> ConsultaListado:
+        errores: list[Detalle] = []
+        filtros = armar_filtros(estado, motivo_archivo, categoria, texto, establecimiento, desde, hasta, plazo, errores)
+        despues_de = None
+        despues_de_por_vencer = None
+        if cursor:
+            despues_de_por_vencer = decodificar_cursor_por_vencer(cursor) if filtros.por_vencer else None
+            despues_de = None if filtros.por_vencer else decodificar_cursor(cursor)
+            if despues_de is None and despues_de_por_vencer is None:
+                errores.append({"path": "cursor", "message": MENSAJE_CURSOR_INVALIDO})
+        fallar_si_hay_errores(errores)
+        return ConsultaListado(
+            limite=limite, filtros=filtros, despues_de=despues_de, despues_de_por_vencer=despues_de_por_vencer
+        )
+
+    return consulta_de_listado
+
+
+consulta_de_listado = crear_consulta_de_listado(LISTADO_LIMITE_POR_DEFECTO)
+consulta_de_listado_de_ipress = crear_consulta_de_listado(CONSULTA_IPRESS_LIMITE_POR_DEFECTO)

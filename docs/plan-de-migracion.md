@@ -32,6 +32,16 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 25. Los disparadores de la base siguen siendo la última palabra: por ejemplo, reabrir un caso archivado por vigencia responde 409 con el mensaje de la regla, no 422 ni 403. Una prueba de integración lo fija contra el esquema del bot.
 26. Dos peticiones simultáneas sobre el mismo caso se serializan por el bloqueo de fila: la segunda ve el estado nuevo y recibe 403 «no puedes…». Lo comprueba una prueba con dos tareas `asyncio` sobre la misma base.
 
+27. `derivaciones`, `indicadores` y `consulta_ipress` viven dentro de `incidencias` y no como contextos aparte, que era lo previsto en el plan inicial: son lecturas del mismo agregado con otra visibilidad y reutilizan el listado, los conteos, el detalle y la evidencia. Como contextos separados, el contrato de independencia les prohibiría esa reutilización. La visibilidad pasó a ser `Visibilidad = VisibilidadOperativa | VisibilidadDeDerivaciones | VisibilidadDeIpress`, y los casos de uso existentes aceptan una explícita.
+28. Con una visibilidad explícita (seguimiento de derivaciones y consulta de IPRESS) los casos salen sin acciones de gestión, como en el Node, que en ese caso no pasa la sesión a quien arma el resumen.
+29. En la consulta de IPRESS el código de la ruta se valida después de la consulta: un `periodo` o un filtro inválido responde 400 antes que el 404 por un RENIPRESS inválido, igual que el Node. El filtro `establecimiento` se valida pero se ignora, porque la ruta ya fija la IPRESS.
+30. El análisis guardado se lee de forma tolerante, campo a campo, como los `.catch` de zod: lo inválido toma su valor por defecto. La ficha de derivación se tipa y se descarta si no tiene la forma esperada, mientras que el Node la devuelve sin validar. Los 29 fragmentos de normas se generaron desde el Node y se comprobó que son idénticos.
+31. `filtro_corrupcion` es un contexto propio y puro. Su léxico, sus clases, el catálogo de 37 entidades y las 18 ubicaciones son JSON generado desde el Node en `constants/datos/` y viajan dentro de la rueda. El motor es síncrono: la ruta es una función normal que FastAPI ejecuta en su grupo de hilos.
+32. Equivalencias con JavaScript sin usar `re`: el recorte usa los blancos de `String.prototype.trim`, la longitud se cuenta en unidades UTF-16, `\p{L}`, `\p{N}` y `\p{M}` salen de `unicodedata`, `Math.round` es `floor(x + 0,5)` y los nombres propios se buscan con un recorrido que imita la expresión del Node.
+33. El índice de coincidencias filtra los candidatos por la segunda palabra y conserva el orden: un texto de 5000 caracteres que repite «si» pasó de 7,7 s a 0,2 s sin cambiar ningún resultado.
+34. Corpus de oro del filtro: `tests/fixtures/corpus_corrupcion_node.json` guarda 835 casos (texto, contexto, `pesoIa` y respuesta) evaluados por el motor real del Node. Se generaron con textos armados desde el léxico y el catálogo, más 15 bordes (vacío, blancos, emojis, 5000 caracteres). Cubre las dos vías de propuesta, la zona gris, el acoso, el titular nombrado y la ubicación. Una prueba exige igualdad exacta.
+35. Con la Fase 6, 36 de las 37 operaciones de `v1.json` están implementadas con su mismo `operationId`; falta solo `GET /eventos` (Fase 8).
+
 ## Fases
 
 | Fase | Alcance | Estado |
@@ -41,8 +51,8 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 | 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Hecha (PR #3) |
 | 3 | `acceso` y `usuarios`, y `GET /areas` | Hecha (PR #4) |
 | 4 | `incidencias`, lectura y evidencias | Hecha (PR #5) |
-| 5 | `incidencias`, las siete acciones | Hecha en su rama |
-| 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Pendiente |
+| 5 | `incidencias`, las siete acciones | Hecha (PR #6) |
+| 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Hecha en su rama |
 | 7 | Archivador y clasificador | Pendiente |
 | 8 | Eventos en tiempo real (SSE con LISTEN/NOTIFY) | Pendiente |
 | 9 | Cierre: auditoría contra `v1.json`, documentación, variables para Infraestructura | Pendiente |

@@ -1,0 +1,335 @@
+{
+ "frases_fuertes": [
+  "{coima|coimas|coimear|coimean|coimeo|coimeando|coimero|coimeros}",
+  "{soborno|sobornos|sobornar|sobornaron|sobornando|cohecho}",
+  "por debajo de la mesa",
+  "{arreglar|arreglan|arreglo|arreglos} con {plata|dinero}",
+  "me {pidio|pidieron|pide|piden} {dinero|plata} para",
+  "me {cobraron|cobro|cobran} ~ para {darme|dar} la cita",
+  "{cobran|cobraban} por {la|las} {cita|citas}",
+  "{venden|vende|vendian} {las|la|los|el} {citas|cita|cupos|cupo|camas|cama}",
+  "{venden|vende|vendian} {citas|cupos|camas}",
+  "pagar para que me atiendan",
+  "pagar para {saltar|saltarse} la cola",
+  "me {ofrecio|ofrecieron} atenderme a cambio de",
+  "{venden|vende|vendian|vendieron} {las|los} {medicinas|medicamentos|remedios}",
+  "se {roban|robaron|llevan|llevaron} {las|los} {medicinas|medicamentos|insumos}",
+  "se {apropio|apropiaron} de",
+  "se {quedo|quedaron} con {el dinero|la plata}",
+  "{usan|usa|usaron} {la|el} {ambulancia|carro|camioneta|vehiculo} ~ para uso personal",
+  "licitacion dirigida",
+  "{favorecieron|favorecio} a {una|su} empresa",
+  "{compras|compra} {sobrevaloradas|sobrevalorada}",
+  "{sobrevaloraron|sobrevaloro|sobrevaloracion}",
+  "{contrataron|contrato} a {su|sus|la|el|los|las} {hermano|hermana|esposa|esposo|primo|prima|sobrino|sobrina|familiar|familiares}",
+  "su {esposa|esposo|familiar|hermano|hermana|primo|prima} es {dueno|duena|propietario|propietaria} de ~ {farmacia|empresa}",
+  "por {dinero|plata} me dijo que podia arreglar",
+  "no {le|les} {cobran|cobraron|cobra|cobro} {las|la} {penalidades|penalidad}",
+  "{perdonaron|perdonan|perdono} {las|la} {multas|multa}",
+  "modificaron el contrato sin razon",
+  "{favorece|favorecen|favorecio} a su {partido|gente|institucion}",
+  "{atiende|atienden|contrata|contratan} solo a los de su partido",
+  "{filtro|filtraron|filtra} informacion reservada",
+  "{dio|dieron|da|dan} informacion privilegiada",
+  "se hizo {rico|rica} sin que",
+  "{tiene|tienen} propiedades que no justifica",
+  "{mordida|mordidas|moche|moches|diezmo|diezmos}",
+  "{bajo|debajo de} la mesa",
+  "bajo cuerda",
+  "por debajo del agua"
+ ],
+ "frases_medias": [
+  "{cobro|cobran|cobraron|cobrar} sin {recibo|boleta|comprobante}",
+  "me {cobraron|cobran|cobro} aparte",
+  "me {pidieron|pidio|piden|pide} {un pago|una propina|un algo}",
+  "trato preferencial",
+  "favoritismo",
+  "{se saltan|se saltaron|se salta} la cola",
+  "{atienden|atendieron|atiende} primero a recomendados",
+  "amigo del director",
+  "es familiar de",
+  "{lo|la} pusieron por ser {pariente|familiar}",
+  "{vende|venden} junto con",
+  "{se enriquecio|se enriquecieron}",
+  "{camioneta|casa} que no corresponde a su sueldo",
+  "me {exigio|exigieron}",
+  "me {condiciono|condicionaron} la atencion a",
+  "{deriva|derivan|derivo|derivaron|derivaba} ~ a su {clinica|consultorio}"
+ ],
+ "frases_debiles": [
+  "{corrupto|corrupta|corruptos|corruptas|corrupcion}",
+  "{mafia|mafias}",
+  "{negociado|negociados}",
+  "abuso de poder",
+  "aprovechamiento",
+  "se {hacen|hace} de la vista gorda"
+ ],
+ "frases_negativas_decisivas": [
+  "{pague|pagamos|pagaron|pago} en caja",
+  "me {dieron|dio|entregaron} {la|mi|el|un|} {boleta|recibo}",
+  "con {recibo|boleta}",
+  "segun el tarifario",
+  "{tarifa|tasa|tarifario|tupa|precio|costo|monto} {oficial|publicada|publicado|vigente|legal|autorizada|autorizado|regular|publico}",
+  "tarifa {normal|correcta}",
+  "copago {del sis|}",
+  "me {robaron|robo} {el|la|mi|mis} {celular|cartera|billetera|mochila|bolso}",
+  "me {asaltaron|asalto}",
+  "se llevaron mi mochila",
+  "{no|nunca|nadie|ni|tampoco} {me|nos|le|les|} @verbo_cobro",
+  "{no|nunca|nadie|ni|tampoco} {me|nos|le|les|} {cobro|solicito}",
+  "{sin|cero} {cobro|cobros|pedido|pedidos}",
+  "no {hubo|hay|habia|existio} {cobro|cobros|pedido|pedidos|pago|coima|coimas|plata}",
+  "no es {tema|cuestion|asunto|cosa|problema} de {plata|dinero|cobro|cobros|pagos}",
+  "nada de {plata|dinero|cobro|coima}"
+ ],
+ "frases_negativas_leves": [
+  "{mala atencion|trato grosero|maltrato|mal trato|maltrataron}",
+  "me gritaron",
+  "{demora|demoras|demoraron}",
+  "mucha cola",
+  "{espere|esperamos|esperaron} horas",
+  "cita reprogramada",
+  "no {hay|habia} {medicinas|medicamentos|cama|camas}",
+  "no funcionaba el equipo",
+  "no me {quisieron|quiso} atender"
+ ],
+ "palabras_que_enganan": [
+  "denuncia",
+  "denuncias",
+  "denunciar",
+  "abuso",
+  "cobro",
+  "pago"
+ ],
+ "palabras_que_niegan": [
+  "no",
+  "nunca",
+  "ni",
+  "sin"
+ ],
+ "negadores_de_cobro": [
+  "no",
+  "nunca",
+  "nadie",
+  "ni",
+  "tampoco",
+  "jamas",
+  "cero"
+ ],
+ "negadores_dentro_del_cobro": [
+  "ningun",
+  "ninguna"
+ ],
+ "inicios_que_ya_niegan": [
+  "no",
+  "nunca",
+  "nadie",
+  "ni",
+  "tampoco",
+  "jamas",
+  "cero",
+  "sin"
+ ],
+ "plantillas_de_la_familia_de_cobro": [
+  "me {pidio|pidieron|pide|piden} {dinero|plata} para",
+  "me {cobraron|cobro|cobran} ~ para {darme|dar} la cita",
+  "{cobran|cobraban} por {la|las} {cita|citas}",
+  "{venden|vende|vendian} {las|la|los|el} {citas|cita|cupos|cupo|camas|cama}",
+  "{venden|vende|vendian} {citas|cupos|camas}",
+  "pagar para que me atiendan",
+  "pagar para {saltar|saltarse} la cola",
+  "me {ofrecio|ofrecieron} atenderme a cambio de",
+  "{venden|vende|vendian|vendieron} {las|los} {medicinas|medicamentos|remedios}",
+  "se {roban|robaron|llevan|llevaron} {las|los} {medicinas|medicamentos|insumos}",
+  "se {apropio|apropiaron} de",
+  "se {quedo|quedaron} con {el dinero|la plata}",
+  "{contrataron|contrato} a {su|sus|la|el|los|las} {hermano|hermana|esposa|esposo|primo|prima|sobrino|sobrina|familiar|familiares}",
+  "me {cobraron|cobran|cobro} aparte",
+  "me {pidieron|pidio|piden|pide} {un pago|una propina|un algo}",
+  "{atienden|atendieron|atiende} primero a recomendados",
+  "me {exigio|exigieron}",
+  "me {condiciono|condicionaron} la atencion a",
+  "{vende|venden} junto con"
+ ],
+ "palabras_de_jefatura": [
+  "jefe",
+  "jefa",
+  "director",
+  "directora",
+  "subdirector",
+  "subdirectora",
+  "administrador",
+  "administradora",
+  "superintendente",
+  "gerente",
+  "titular",
+  "ministro",
+  "ministra",
+  "viceministro",
+  "viceministra",
+  "presidente",
+  "presidenta",
+  "coordinador",
+  "coordinadora"
+ ],
+ "frases_de_acoso": [
+  "{acoso|acosa|acosan|acosaba|acosaban|acosador|acosadora|acosando|acosarme|acosarla|hostiga|hostigan|hostigaba|hostigamiento|hostigando|hostigarme|hostigador|hostigadora}",
+  "{tocamiento|tocamientos|toqueteo|toqueteos|manoseo|manoseos|manosea|manosean|manosearon|toquetea|toquetean|toquetearon}",
+  "me {toco|tocaron|toca|tocaba|tocaban|tocar} {la|el|las|los|mi|mis} {pierna|piernas|cintura|trasero|pecho|senos|nalgas|cuerpo|espalda|cadera|muslo|muslos|busto|cara|cabello|pelo}",
+  "{le|les} {toco|tocaron|toca|tocaba|tocaban} {la|el|las|los|su|sus} {pierna|piernas|cintura|trasero|pecho|senos|nalgas|cuerpo|espalda|cadera|muslo|muslos|busto}",
+  "me {agarro|agarraron|agarra|abrazo|beso|besaron|acaricio} ~ {a la fuerza|sin permiso|sin mi permiso|a la mala}",
+  "se {propaso|propasaron|propasa|propasan|propasando}",
+  "{propuesta|propuestas|proposiciones} {indecentes|sexuales|indecorosas}",
+  "{insinuaciones|insinuacion} sexuales",
+  "{comentarios|comentario|piropos|bromas} {sexuales|obscenos|morbosos|vulgares|indecentes|de doble sentido}",
+  "me {miraba|mira|miran|miraban} {el cuerpo|las piernas|el trasero|el pecho|con morbo|de arriba abajo}",
+  "me {escribe|escribia|manda|mandaba|mando|enviaba|envio} ~ mensajes {indecentes|sexuales|obscenos|insinuantes|fuera de horario}",
+  "me {invito|invitaba|invitan|invito} a {un hotel|su casa|su cuarto|su departamento}",
+  "{abuso sexual|violacion|intento de violacion|abusaron de mi|abuso de mi|intento violarme|violarme}"
+ ],
+ "cargos": [
+  {
+   "plantilla": "{director|directora} {general|ejecutivo|ejecutiva}",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{ministro|ministra} de salud",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{jefe|jefa} institucional",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{jefe|jefa} del {instituto|sis|seguro integral de salud}",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{superintendente|superintendenta}",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{presidente|presidenta} {ejecutivo|ejecutiva}",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{director|directora} del hospital",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{director|directora} de la diris",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "coordinador general",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{ministro|ministra|viceministro|viceministra}",
+   "nivel": "CARGO_MAXIMO"
+  },
+  {
+   "plantilla": "{jefe|jefa} de {admision|emergencia|farmacia|logistica|abastecimiento|personal|servicio}",
+   "nivel": "CARGO_DE_LINEA"
+  },
+  {
+   "plantilla": "{director|directora}",
+   "nivel": "CARGO_DE_LINEA"
+  },
+  {
+   "plantilla": "{subdirector|subdirectora|administrador|administradora|tesorero|tesorera|cajero|cajera}",
+   "nivel": "CARGO_DE_LINEA"
+  },
+  {
+   "plantilla": "{medico|medica|medicos|doctor|doctora|doctores}",
+   "nivel": "PERSONAL"
+  },
+  {
+   "plantilla": "{enfermero|enfermera|enfermeros|enfermeras}",
+   "nivel": "PERSONAL"
+  },
+  {
+   "plantilla": "{tecnico|tecnica|tecnicos|tecnicas}",
+   "nivel": "PERSONAL"
+  },
+  {
+   "plantilla": "{obstetra|obstetras|vigilante|vigilantes|chofer|choferes}",
+   "nivel": "PERSONAL"
+  },
+  {
+   "plantilla": "personal de {admision|farmacia}",
+   "nivel": "PERSONAL"
+  }
+ ],
+ "frases_de_pruebas": [
+  "{prueba|pruebas|evidencia|evidencias}",
+  "{foto|fotos|fotografia|fotografias|video|videos|audio|audios|grabacion|grabaciones|captura|capturas|documento|documentos}",
+  "tengo {chats|mensajes|testigos|testigo}"
+ ],
+ "frases_fuertes_de_cobro": [
+  "@verbo_cobro ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte} ~ {por|para} {el|la|los|las|un|una|mi|su|} @complemento",
+  "{me|nos|le|les|te} {cobro|solicito} ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte} ~ {por|para} {el|la|los|las|un|una|mi|su|} @complemento",
+  "cobro ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte} ~ {por|para} {el|la|los|las|un|una|mi|su|} @complemento",
+  "@verbo_cobro ~ {algo|algito|algo de plata|algo a cambio|apoyo|un apoyo|favor|un favor|un regalo} ~ {por|para} {el|la|los|las|un|una|mi|su|} @complemento",
+  "{me|nos|le|les|te} {cobro|solicito} ~ {algo|algito|algo de plata|algo a cambio|apoyo|un apoyo|favor|un favor|un regalo} ~ {por|para} {el|la|los|las|un|una|mi|su|} @complemento",
+  "@verbo_cobrar {por|para} {el|la|los|las|un|una|mi|su|} @bien_vendible",
+  "me {sacaron|sacan|saco|sacaban|sacar|sacarme|quisieron sacar} ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera}",
+  "{arreglar|arreglo|arreglan|arreglas|arreglamos|arreglaron|arreglarlo|arreglarte|arreglarse|arregla} ~ con {un|una|el|la|su|} {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte|algo|algito|algo de plata|algo a cambio|apoyo|un apoyo|favor|un favor|un regalo}",
+  "se {quedan|quedo|quedaron|queda|quedarse|quedara} con ~ {parte|una parte|porcentaje|plata|dinero|fondos|vueltos|vuelto|diferencia|aportes|cuotas|donaciones|comision|ganancia|ganancias}",
+  "se {embolsan|embolsa|embolso|embolsaron|embolsarse}",
+  "se {lo|los|la|las} {echo|echan|echaron|metio|metieron|guardo|guardaron|pasa|pasan} ~ al bolsillo",
+  "{recibe|recibio|recibiendo|reciben|recibian|recibieron|recibia|recibir} ~ {un sobre con|un presente|un regalito|un porcentaje|porcentaje|comision|comisiones|propina|propinas|dadiva|dadivas|billetes|gaseosa}",
+  "{recibe|recibio|recibiendo|reciben|recibian|recibieron|recibia|recibir} ~ {plata|dinero|monto|billete} de {los|las} @tercero",
+  "se {roban|robaron|robando|llevan|llevo|llevaron|llevaba|llevaban|llevarse|apropian|apropia|apropiaron|desvian|desviaron|desvia|desviar|quedan|quedaron|quedo} ~ @bien_publico_fuerte",
+  "{venden|vende|vendio|vendieron|vendia|vendian|vender|vendiendo|revenden|revende|revendio} ~ {el|la|los|las|mi|sus|su|} @bien_vendible",
+  "me {vendio|vendieron|vende|venden} ~ @bien_vendible",
+  "@verbo_colocar ~ a {su|sus|puro|puros|puras|toda su|todos sus} @pariente",
+  "@verbo_colocar ~ a {la|el|los|las} @pariente_directo"
+ ],
+ "frases_medias_de_cobro": [
+  "@verbo_cobro ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte}",
+  "{me|nos|le|les|te} {cobro|solicito} ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte}",
+  "@verbo_cobro ~ {a|de} {los|las} @tercero ~ {monto|por fuera|aparte}",
+  "{me|nos|le|les|te} {cobro|solicito} ~ {a|de} {los|las} @tercero ~ {monto|por fuera|aparte}",
+  "@verbo_cobrar {por|para} {el|la|los|las|un|una|} {atender|firmar|aprobar|dar|entregar|operar|acelerar|adelantar|tramitar|atencion|firma}",
+  "si {no|} {le|les|me|} {dejaba|dejo|dejas|dejaban|dejara|daba|das|doy|diera|dieras|entregaba|entregas|entrego|alcanzaba|alcanzo|alcanzas|yapeaba|yapeas|yapeo|yapee|depositaba|depositas} ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte}",
+  "{caerle|caerles|caer|caigo|cae|caes} con {un|una|el|la|su|} {detalle|detallito|billete|sobre|algo|plata|regalito|propina|gaseosa}",
+  "{ponerse|ponerme|ponerte|ponerle|poner|ponga|pongo|pones|ponte|ponen|pusieron} con {un|una|el|la|su|} {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte|algo|algito|algo de plata|algo a cambio|apoyo|un apoyo|favor|un favor|un regalo}",
+  "{hace|hacen|hizo|hicieron|obliga|obligan|obligo|obligaron|manda|mandan|mando|obligar|hacer} {pagar|poner|dejar|aportar|cotizar|yapear|depositar} ~ {plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte}",
+  "{plata|platita|dinero|dinerito|monto|soles|un sol|cuota|cuotas|su cuota|una cuota|efectivo|yape|yapes|billete|billetes|un billete|lucas|porcentaje|un porcentaje|comision|comisiones|una comision|un pago extra|pago extra|pago adicional|un pago adicional|pago aparte|un pago aparte|un pago por fuera|propina|propinas|una propina|propinita|un sobre con|detallito|un detallito|gaseosa|una gaseosa|gaseosita|chela|cafecito|un cafecito|regalito|un regalito|un presente|colaboracion|una colaboracion|aporte|un aporte} {por fuera|por la izquierda|por debajo|bajo la mesa|bajo cuerda|aparte}",
+  "{para|por} {su|la|mi|una|el|un|} {gaseosa|gaseosita|chela|cafecito|propina|propinita}",
+  "{le|les|se} {paga|pagan|pago|pagaron|pagas|pagamos|pagaba|pagaban|pagare} ~ para {que|no|poder|conseguir|obtener}",
+  "{pagar|paga|pagan|pagaron|pagamos|pague|pagando|arreglan|arreglar|arreglaron|dar|dan|dieron|da|dejar|dejan|dejaron|recibe|reciben|recibio|cobran|cobra|cobrar|cobraron|mueve|mueven} ~ por debajo",
+  "con {un|el|su} {billete|billetes|billetito}",
+  "{prioriza|priorizan|priorizo|priorizaron|favorece|favorecen|favorecio|favorecieron|beneficia|benefician|beneficio|beneficiaron|acomoda|acomodan|acomodo|acomodaron|atiende|atienden|atendio|atendieron|pasan|pasar|pasaron|pasaba|afilia|afilian|cuelan|colan|colaron|colar|colarlos} ~ @conocidos",
+  "@negocio ~ de {su|sus} @pariente",
+  "{sin concurso|sin convocatoria|sin proceso de seleccion|a dedo}",
+  "{deja|dejan|dejo|dejaron|dejar|entrega|entregan|da|dan|devuelve|devuelven|pasa|pasan|alcanza|alcanzan} ~ {el|un|su|} {porcentaje|comision|diezmo|moche|mordida|sobre|presente}",
+  "{devuelve|devuelven|devolver|devolvio|devolvieron} ~ {el|un} favor",
+  "a cambio de {un|el|algun|} {algo|plata|dinero|favor|favores|pago|monto|propina|regalo}",
+  "{condiciona|condicionan|condiciono|condicionaron|condicionar} ~ {a|con} {el|un|} {pago|plata|dinero|porcentaje|monto|aporte|colaboracion}",
+  "{por|con|a cambio de} {monto|plata|dinero|un sobre|un billete} ~ @accion_favor",
+  "{combustible|gasolina|petroleo|vales|viaticos} {de mas|repetidos|duplicados|inflados}",
+  "{combustible|gasolina|vales|viaticos|camioneta|camionetas|carro|carros|vehiculo|vehiculos|ambulancia} ~ {sus|los} @conocidos",
+  "{sacan|saco|sacaron|sacar|saca|sacando} ~ {del|de la} {almacen|farmacia|deposito|bodega}",
+  "se {roban|robaron|robando|llevan|llevo|llevaron|llevaba|llevaban|llevarse|apropian|apropia|apropiaron|desvian|desviaron|desvia|desviar|quedan|quedaron|quedo} ~ @bien_publico_ambiguo"
+ ],
+ "frases_debiles_de_cobro": [
+  "{cuelan|colan|colaron|colo|colar|colarme|colarlo|colarse|cuela|colando} ~ @cola_o_lista",
+  "{pasar|pasan|pasaron|pasa|pasarme|pasarlo|pasando} por encima de ~ {cola|lista|fila|turno|turnos|otros|pacientes|los demas}"
+ ],
+ "frases_fuertes_sin_verbo": [
+  "{mordida|mordidas|moche|moches|diezmo|diezmos}",
+  "{bajo|debajo de} la mesa",
+  "bajo cuerda",
+  "por debajo del agua"
+ ],
+ "negaciones_de_cobro": [
+  "{no|nunca|nadie|ni|tampoco} {me|nos|le|les|} @verbo_cobro",
+  "{no|nunca|nadie|ni|tampoco} {me|nos|le|les|} {cobro|solicito}",
+  "{sin|cero} {cobro|cobros|pedido|pedidos}",
+  "no {hubo|hay|habia|existio} {cobro|cobros|pedido|pedidos|pago|coima|coimas|plata}",
+  "no es {tema|cuestion|asunto|cosa|problema} de {plata|dinero|cobro|cobros|pagos}",
+  "nada de {plata|dinero|cobro|coima}"
+ ]
+}
