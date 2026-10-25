@@ -14,7 +14,13 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 8. La cookie de sesión es compatible byte a byte con `cookie-parser` y `res.cookie` de Express; los vectores salen del Node real (`tests/fixtures/vectores_node.json`, generados con la pila de `minsa-incidencias-backend`). Las cabeceras de seguridad son las de `helmet` 8.3.0, más `Cache-Control: no-store`; la política de contenido se omite en `/docs`, `/redoc` y `/openapi.json`.
 9. La sesión se resuelve por un puerto (`SessionResolver`). Hasta la Fase 3 el resolvedor de producción no reconoce ninguna sesión, así que toda cookie firmada y bien formada responde `INVALID_SESSION`.
 10. El limitador es por proceso (cubeta de fichas con el mismo cálculo del Node), con barrido cada 60 s. Con `TRUST_PROXY=true` la IP es el primer valor de `X-Forwarded-For`. Los límites de login (por correo y por IP) llegan con la Fase 3 porque leen el cuerpo. El control de conexiones de tiempo real (`iniciarVerificacion`/`liberar`) llega con la Fase 8.
-11. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
+11. Los hashes de contraseña que ya existen en la base los generó el Node con argon2id y ordenan los parámetros como `m,p,t`; la biblioteca de Python los exige como `m,t,p`. `shared/argon2_hash.py` los reordena antes de verificar, y una prueba usa hashes generados por el Node real (`tests/fixtures/hashes_argon2_node.json`). Los hashes nuevos salen en el orden estándar y el Node también los verifica.
+12. Los límites de login (5 por correo y 30 por IP en 900 s) corren antes de validar el cuerpo, como en el Node, y se cuentan con el correo recortado y en minúsculas.
+13. El permiso por vista (`require_vista`) y la matriz de roles viven en el núcleo (`shared/permisos.py`). Solo trae lo que usan `acceso`, `usuarios` y `GET /areas`; las acciones sobre incidencias y las tarjetas llegan con sus fases.
+14. Las reglas de los disparadores se traducen por fragmento de mensaje a 409 (conflicto) o 422 (regla corregible) en `shared/reglas_de_la_base.py`. La tabla completa (33 reglas) ya está cargada aunque las de incidencias se ejercitan en la Fase 5.
+15. La cobertura mínima de las pruebas unitarias (98 %) no mide `adapters/persistence/`: esos adaptadores se miden con las pruebas de integración contra el esquema del bot. Con ambas tandas la cobertura total es 99,9 %.
+16. Fuera de esta fase queda el cierre de conexiones en vivo al desactivar o cambiar a un usuario (`seguimiento.invalidarUsuario` del Node); llega con la Fase 8.
+17. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
 
 ## Fases
 
@@ -22,8 +28,8 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 |---|---|---|
 | 0 | Preparación: contrato de referencia, base plantilla, sustitución del ejemplo por el contexto `catalogos` con `GET /v1/catalogos/plazos` | Hecha (PR #1) |
 | 1 | Contrato de errores del Node (`success`, 400 de validación, 404 por método, los 18 códigos) | Hecha (PR #2) |
-| 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Hecha en su rama |
-| 3 | `acceso` y `usuarios`, y `GET /areas` | Pendiente |
+| 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Hecha (PR #3) |
+| 3 | `acceso` y `usuarios`, y `GET /areas` | Hecha en su rama |
 | 4 | `incidencias`, lectura y evidencias | Pendiente |
 | 5 | `incidencias`, las siete acciones | Pendiente |
 | 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Pendiente |

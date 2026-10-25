@@ -85,7 +85,7 @@ src/app/
   errors/            una clase de error por archivo, con el nombre del archivo igual al de la clase
   health/            rutas /salud y /salud/listo
   shared/            núcleo compartido sin negocio: errores, reloj, logs, base, errores HTTP
-  <contexto>/        un contexto delimitado (hoy: catalogos)
+  <contexto>/        un contexto delimitado (hoy: catalogos, acceso, usuarios)
     domain/          reglas de negocio puras y síncronas; sin frameworks ni drivers (errors/ propios, constantes y patrones)
     application/     casos de uso y puertos (protocolos); no conocen HTTP ni SQL
     adapters/
@@ -104,7 +104,7 @@ docs/
 - **Un contexto no importa de otro** ni de la implementación de otro; lo compartido va a `shared/`.
 - **Carpetas puras:** `constants/`, `enums/` y `errors/` no importan capas ni frameworks (`import-linter`). Los números de regla van en `constants/`; las expresiones regulares, solo en archivos de patrones (`<contexto>/domain/patrones.py`); una prueba lo vigila.
 - **Un archivo, una prueba:** `src/app/<ruta>/x.py` tiene su prueba en `tests/<ruta>/test_x.py`. Las excepciones (archivos de solo constantes, protocolos o arranque) están declaradas con su motivo en `tests/convenciones/test_codigo.py`.
-- **Nombres:** el dominio va en español (`catalogos`, `plazo`) y lo técnico en inglés (`repository`, `settings`).
+- **Nombres:** el dominio va en español (`catalogos`, `acceso`, `usuarios`, `plazo`) y lo técnico en inglés (`repository`, `settings`).
 - **Contexto nuevo:** se crea `src/app/<contexto>/{domain,application,adapters}`, su espejo en `tests/` y se monta su router en `composition.py`.
 
 Los endpoints se documentan en la especificación OpenAPI de `/v1` (visible fuera de producción).
