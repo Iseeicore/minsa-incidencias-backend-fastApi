@@ -1,0 +1,129 @@
+{
+  "secreto": "secreto-de-prueba-0123456789-abcdefghijklmnop",
+  "anterior": "secreto-anterior-9876543210-zyxwvutsrqponmlk",
+  "otro": "secreto-ajeno-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "firmas": [
+    {
+      "id": "0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69",
+      "setCookie": [
+        "gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.5%2FQ2FsMaVop3lazfFjZ0PjIrIY4hNBW6c9ACKUiat6I; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; SameSite=Strict",
+        "__Host-gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.5%2FQ2FsMaVop3lazfFjZ0PjIrIY4hNBW6c9ACKUiat6I; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; Secure; SameSite=Strict"
+      ]
+    },
+    {
+      "id": "ffffffff-ffff-4fff-bfff-ffffffffffff",
+      "setCookie": [
+        "gestion_sid=s%3Affffffff-ffff-4fff-bfff-ffffffffffff.KwZWDi9kbzqNJloh177tK3XbFnE4d0GhcPIUzp%2BbEXg; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; SameSite=Strict",
+        "__Host-gestion_sid=s%3Affffffff-ffff-4fff-bfff-ffffffffffff.KwZWDi9kbzqNJloh177tK3XbFnE4d0GhcPIUzp%2BbEXg; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; Secure; SameSite=Strict"
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000000",
+      "setCookie": [
+        "gestion_sid=s%3A00000000-0000-4000-8000-000000000000.d2gSFN2vb%2BRGgqXQeJA8l5JuE4%2B9tuiKv4dOHUYhSPI; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; SameSite=Strict",
+        "__Host-gestion_sid=s%3A00000000-0000-4000-8000-000000000000.d2gSFN2vb%2BRGgqXQeJA8l5JuE4%2B9tuiKv4dOHUYhSPI; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; Secure; SameSite=Strict"
+      ]
+    },
+    {
+      "id": "a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d",
+      "setCookie": [
+        "gestion_sid=s%3Aa1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d.EUuQH1UGoxbYs4KJSzsSeGFEsHuBqhRQFjG5%2Bvm6xKU; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; SameSite=Strict",
+        "__Host-gestion_sid=s%3Aa1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c5d.EUuQH1UGoxbYs4KJSzsSeGFEsHuBqhRQFjG5%2Bvm6xKU; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; Secure; SameSite=Strict"
+      ]
+    },
+    {
+      "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "setCookie": [
+        "gestion_sid=s%3A7c9e6679-7425-40de-944b-e07fc1f90ae7.vLbaJ2gnVVz5BL7%2BlwPbsn1iUECAaIonOLYv%2BgUhhfs; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; SameSite=Strict",
+        "__Host-gestion_sid=s%3A7c9e6679-7425-40de-944b-e07fc1f90ae7.vLbaJ2gnVVz5BL7%2BlwPbsn1iUECAaIonOLYv%2BgUhhfs; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; Secure; SameSite=Strict"
+      ]
+    },
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "setCookie": [
+        "gestion_sid=s%3A123e4567-e89b-12d3-a456-426614174000.Nc17VpPzW1KzAUJZJ%2BKfjYAfrS6CtPTRGtmyQAaWwMQ; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; SameSite=Strict",
+        "__Host-gestion_sid=s%3A123e4567-e89b-12d3-a456-426614174000.Nc17VpPzW1KzAUJZJ%2BKfjYAfrS6CtPTRGtmyQAaWwMQ; Max-Age=1800; Path=/; Expires=Sun, 25 Oct 2026 04:35:20 GMT; HttpOnly; Secure; SameSite=Strict"
+      ]
+    }
+  ],
+  "lecturas": [
+    {
+      "nombre": "actual",
+      "cookie": "gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.5%2FQ2FsMaVop3lazfFjZ0PjIrIY4hNBW6c9ACKUiat6I",
+      "firmada": "0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69",
+      "firmadaEsFalse": false
+    },
+    {
+      "nombre": "anterior",
+      "cookie": "gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.vHf%2F2dg0d3%2F7Z4aneGG%2FzSKIA%2FO%2B18sNKT%2F6z%2BQezds",
+      "firmada": "0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69",
+      "firmadaEsFalse": false
+    },
+    {
+      "nombre": "ajeno",
+      "cookie": "gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.rAFbPOJRCEa%2BX2LGn47faF1yLoIBngCOQNp%2FvzW%2FBwU",
+      "firmada": false,
+      "firmadaEsFalse": true
+    },
+    {
+      "nombre": "sinPrefijo",
+      "cookie": "gestion_sid=0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.5%2FQ2FsMaVop3lazfFjZ0PjIrIY4hNBW6c9ACKUiat6I",
+      "firmada": null,
+      "firmadaEsFalse": false
+    },
+    {
+      "nombre": "adulterado",
+      "cookie": "gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.KwZWDi9kbzqNJloh177tK3XbFnE4d0GhcPIUzp%2BbEXg",
+      "firmada": false,
+      "firmadaEsFalse": true
+    },
+    {
+      "nombre": "sinFirma",
+      "cookie": "gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69",
+      "firmada": false,
+      "firmadaEsFalse": true
+    },
+    {
+      "nombre": "noUuid",
+      "cookie": "gestion_sid=s%3Ano-es-uuid.xoG%2FmqSETlWKt05%2Ft%2Fz%2BYbWx3JebE6IBaJskupPyLYU",
+      "firmada": "no-es-uuid",
+      "firmadaEsFalse": false
+    },
+    {
+      "nombre": "conPuntoExtra",
+      "cookie": "gestion_sid=s%3A0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.x.2N4DBT%2Fo45JYLT0o7cgUOFgHo7mNEYgUHfK18GCl%2BRg",
+      "firmada": "0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.x",
+      "firmadaEsFalse": false
+    },
+    {
+      "nombre": "vacio",
+      "cookie": "gestion_sid=",
+      "firmada": null,
+      "firmadaEsFalse": false
+    },
+    {
+      "nombre": "sinCodificar",
+      "cookie": "gestion_sid=s:0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69.5/Q2FsMaVop3lazfFjZ0PjIrIY4hNBW6c9ACKUiat6I",
+      "firmada": "0b9f8c9e-7d0a-4f5b-9a3c-1e2d3c4b5a69",
+      "firmadaEsFalse": false
+    }
+  ],
+  "borrado": [
+    "gestion_sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Strict",
+    "__Host-gestion_sid=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Strict"
+  ],
+  "helmet": {
+    "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https: data:;form-action 'self';frame-ancestors 'self';img-src 'self' data:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' https: 'unsafe-inline';upgrade-insecure-requests",
+    "cross-origin-opener-policy": "same-origin",
+    "cross-origin-resource-policy": "same-origin",
+    "origin-agent-cluster": "?1",
+    "referrer-policy": "no-referrer",
+    "strict-transport-security": "max-age=31536000; includeSubDomains",
+    "x-content-type-options": "nosniff",
+    "x-dns-prefetch-control": "off",
+    "x-download-options": "noopen",
+    "x-frame-options": "SAMEORIGIN",
+    "x-permitted-cross-domain-policies": "none",
+    "x-xss-protection": "0"
+  }
+}

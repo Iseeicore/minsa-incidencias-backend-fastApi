@@ -1,6 +1,15 @@
 from app.catalogos.domain.plazo_de_categoria import PlazoDeCategoria
 from app.enums.categoria_incidencia import CategoriaIncidencia
+from app.shared.http_security import HttpSecurity
+from app.shared.rate_limit import RateLimitPolicies
 from app.shared.sesion import SesionActual
+from app.shared.session_cookie import SessionCookieConfig
+from app.shared.token_bucket import BucketPolicy
+
+SECRETO_DE_PRUEBA = "secreto-de-prueba-0123456789-abcdefghijklmnop"
+SECRETO_ANTERIOR = "secreto-anterior-9876543210-zyxwvutsrqponmlk"
+CAPACIDAD_HOLGADA = 1000
+VENTANA_DE_PRUEBA = 60
 
 
 def un_plazo(
@@ -32,4 +41,26 @@ def una_sesion(correo: str = "gestor@minsa.gob.pe") -> SesionActual:
         correo=correo,
         nombre_completo="Gestor de Prueba",
         roles=("GESTOR",),
+    )
+
+
+def una_politica(capacidad: int = CAPACIDAD_HOLGADA, ventana: int = VENTANA_DE_PRUEBA) -> BucketPolicy:
+    return BucketPolicy(capacity=capacidad, window_seconds=ventana)
+
+
+def una_config_de_cookie(*, produccion: bool = False) -> SessionCookieConfig:
+    return SessionCookieConfig(secrets=(SECRETO_DE_PRUEBA, SECRETO_ANTERIOR), production=produccion)
+
+
+def una_seguridad(
+    origenes: tuple[str, ...] = (),
+    politicas: RateLimitPolicies | None = None,
+    *,
+    confiar_en_proxy: bool = False,
+) -> HttpSecurity:
+    return HttpSecurity(
+        cookies=una_config_de_cookie(),
+        rate_limits=politicas or RateLimitPolicies(authenticated=una_politica(), anonymous=una_politica()),
+        allowed_origins=origenes,
+        trust_proxy=confiar_en_proxy,
     )
