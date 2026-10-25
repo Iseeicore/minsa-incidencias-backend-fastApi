@@ -143,6 +143,18 @@ class ResultadoCombinacion:
 
 
 @dataclass(frozen=True, slots=True)
+class SenalQuejaReclamo:
+    frase: str
+    categoria: CategoriaIncidencia
+
+
+@dataclass(frozen=True, slots=True)
+class ResultadoQuejaReclamo:
+    categoria: CategoriaIncidencia | None
+    senales: tuple[SenalQuejaReclamo, ...]
+
+
+@dataclass(frozen=True, slots=True)
 class EvaluacionDeCorrupcion:
     resultado: ResultadoCorrupcion
     combinacion: ResultadoCombinacion | None = field(default=None)
