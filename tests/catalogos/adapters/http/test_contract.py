@@ -21,7 +21,7 @@ async def test_los_plazos_sin_sesion_cumplen_el_contrato() -> None:
         validar_contrato(openapi_v1(contenedor), await cliente.get(RUTA))
 
 
-@pytest.mark.parametrize("error", [DatabaseUnavailable(), DatabaseTimeout()], ids=["503", "504"])
+@pytest.mark.parametrize("error", [DatabaseUnavailable(), DatabaseTimeout()], ids=["no-disponible", "tiempo-agotado"])
 async def test_los_fallos_de_la_base_cumplen_el_contrato(error: Exception) -> None:
     contenedor = un_contenedor(RaisingPlazoRepository(error))
     async with un_cliente(contenedor) as cliente:

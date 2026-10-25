@@ -40,20 +40,21 @@ async def test_una_ruta_inexistente_responde_con_el_formato_unico(ruta: str) -> 
 
     assert respuesta.status_code == HTTPStatus.NOT_FOUND
     assert respuesta.json() == {
+        "success": False,
         "statusCode": 404,
-        "errorCode": "ROUTE_NOT_FOUND",
-        "message": "La ruta no existe",
-        "timestamp": "2026-10-24T12:00:00Z",
+        "errorCode": "NOT_FOUND",
+        "message": "El recurso solicitado no existe.",
+        "timestamp": "2026-10-24T12:00:00.000Z",
         "path": ruta,
     }
 
 
-async def test_un_metodo_no_permitido_responde_405_con_el_formato_unico() -> None:
+async def test_un_metodo_no_permitido_responde_404_como_el_node() -> None:
     async with un_cliente(un_contenedor()) as cliente:
         respuesta = await cliente.delete(RUTA)
 
-    assert respuesta.status_code == HTTPStatus.METHOD_NOT_ALLOWED
-    assert respuesta.json()["errorCode"] == "METHOD_NOT_ALLOWED"
+    assert respuesta.status_code == HTTPStatus.NOT_FOUND
+    assert respuesta.json()["errorCode"] == "NOT_FOUND"
     assert respuesta.json()["path"] == RUTA
 
 
@@ -63,7 +64,7 @@ async def test_un_error_inesperado_responde_500_sin_filtrar_el_mensaje_interno()
 
     assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     assert respuesta.json()["errorCode"] == "INTERNAL_ERROR"
-    assert respuesta.json()["message"] == "Ocurrió un error interno"
+    assert respuesta.json()["message"] == "Ocurrió un error interno. Inténtalo más tarde."
     assert "secreto" not in respuesta.text
 
 
@@ -97,7 +98,7 @@ async def test_un_error_de_dominio_interno_responde_500_y_se_registra(capsys: py
 
     registros = [evento for evento in _eventos(capsys.readouterr().out) if evento["event"] == "internal_domain_error"]
     assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
-    assert respuesta.json()["message"] == "Ocurrió un error interno"
+    assert respuesta.json()["message"] == "Ocurrió un error interno. Inténtalo más tarde."
     assert "detalle interno" not in respuesta.text
     assert len(registros) == 1
 
@@ -106,11 +107,42 @@ async def test_el_detalle_de_un_cuerpo_invalido_trae_solo_ruta_y_mensaje_sin_rep
     async with un_cliente_de(una_app_minima()) as cliente:
         respuesta = await cliente.post("/eco", json={"texto": 12345, "otro": "dato-del-cliente"})
 
+    assert respuesta.status_code == HTTPStatus.BAD_REQUEST
+    assert respuesta.json()["success"] is False
+    assert respuesta.json()["errorCode"] == "VALIDATION_FAILED"
+    assert respuesta.json()["message"] == "Los datos enviados no son válidos."
     detalles = respuesta.json()["details"]
-    assert {"path": "body.texto", "message": "Input should be a valid string"} in detalles
+    assert {"path": "texto", "message": "Input should be a valid string"} in detalles
     assert all(set(detalle) == {"path", "message"} for detalle in detalles)
     assert "dato-del-cliente" not in respuesta.text
     assert "12345" not in respuesta.text
+
+
+async def test_un_json_mal_formado_responde_400_sin_detalles() -> None:
+    async with un_cliente_de(una_app_minima()) as cliente:
+        respuesta = await cliente.post("/eco", content="{no es json", headers={"Content-Type": "application/json"})
+
+    assert respuesta.status_code == HTTPStatus.BAD_REQUEST
+    assert respuesta.json()["errorCode"] == "VALIDATION_FAILED"
+    assert "details" not in respuesta.json()
+
+
+@pytest.mark.parametrize(
+    ("estado", "codigo"),
+    [(401, "UNAUTHORIZED"), (403, "FORBIDDEN"), (413, "PAYLOAD_TOO_LARGE"), (429, "RATE_LIMITED")],
+)
+async def test_los_estados_http_del_contrato_conservan_su_codigo(estado: int, codigo: str) -> None:
+    app = FastAPI()
+    register_error_handlers(app, FixedClock())
+
+    @app.get("/estado")
+    async def estado_http() -> None:
+        raise StarletteHTTPException(status_code=estado)
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://prueba") as cliente:
+        respuesta = await cliente.get("/estado")
+
+    assert (respuesta.status_code, respuesta.json()["errorCode"]) == (estado, codigo)
 
 
 async def test_un_estado_http_no_estandar_no_rompe_el_manejador() -> None:
@@ -124,8 +156,8 @@ async def test_un_estado_http_no_estandar_no_rompe_el_manejador() -> None:
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://prueba") as cliente:
         respuesta = await cliente.get("/raro")
 
-    assert respuesta.status_code == 499
-    assert respuesta.json()["errorCode"] == "HTTP_ERROR"
+    assert respuesta.status_code == HTTPStatus.BAD_REQUEST
+    assert respuesta.json()["errorCode"] == "VALIDATION_FAILED"
 
 
 async def _descartar(message: Message) -> None:  # noqa: ARG001
@@ -182,8 +214,8 @@ async def test_un_error_http_del_servidor_lanzado_a_mano_se_registra_y_no_filtra
         respuesta = await cliente.get("/manual")
 
     registros = [e for e in _eventos(capsys.readouterr().out) if e["event"] == "http_exception_server_error"]
-    assert respuesta.status_code == estado
+    assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     assert respuesta.json()["errorCode"] == "INTERNAL_ERROR"
-    assert respuesta.json()["message"] == "Ocurrió un error interno"
+    assert respuesta.json()["message"] == "Ocurrió un error interno. Inténtalo más tarde."
     assert "detalle interno" not in respuesta.text
     assert len(registros) == 1

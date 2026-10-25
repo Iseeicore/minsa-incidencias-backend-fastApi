@@ -43,13 +43,10 @@ async def test_sin_sesion_responde_401_y_no_consulta_el_catalogo() -> None:
     assert respuesta.json()["errorCode"] == "UNAUTHORIZED"
 
 
-@pytest.mark.parametrize(
-    ("error", "estado"),
-    [(DatabaseUnavailable(), HTTPStatus.SERVICE_UNAVAILABLE), (DatabaseTimeout(), HTTPStatus.GATEWAY_TIMEOUT)],
-    ids=["no-disponible", "tiempo-agotado"],
-)
-async def test_los_fallos_de_la_base_responden_503_o_504(error: Exception, estado: HTTPStatus) -> None:
+@pytest.mark.parametrize("error", [DatabaseUnavailable(), DatabaseTimeout()], ids=["no-disponible", "tiempo-agotado"])
+async def test_los_fallos_de_la_base_responden_500_sin_detalle(error: Exception) -> None:
     async with un_cliente(un_contenedor(RaisingPlazoRepository(error))) as cliente:
         respuesta = await cliente.get(RUTA)
 
-    assert respuesta.status_code == estado
+    assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert respuesta.json()["errorCode"] == "INTERNAL_ERROR"

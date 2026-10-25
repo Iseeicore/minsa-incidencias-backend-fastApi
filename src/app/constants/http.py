@@ -14,7 +14,11 @@ SECURITY_HEADERS = {
     "Referrer-Policy": "no-referrer",
     "X-Frame-Options": "DENY",
 }
-TIMESTAMP_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
-EXAMPLE_TIMESTAMP = "2026-10-24T12:00:00Z"
+TIMESTAMP_PRECISION = "milliseconds"
+UTC_OFFSET_SUFFIX = "+00:00"
+UTC_ZULU_SUFFIX = "Z"
+EXAMPLE_TIMESTAMP = "2026-10-24T12:00:00.000Z"
+VALIDATION_LOCATIONS = frozenset({"body", "query", "path", "header", "cookie"})
+JSON_INVALID_ERROR_TYPE = "json_invalid"
 EXAMPLE_PATH = "/recurso"
 SESSION_STATE_KEY = "sesion"

@@ -6,26 +6,10 @@ from app.errors.database_timeout import DatabaseTimeout
 from app.errors.database_unavailable import DatabaseUnavailable
 
 
-@pytest.mark.parametrize(
-    ("error", "categoria", "codigo", "mensaje"),
-    [
-        (
-            DatabaseUnavailable(),
-            ErrorCategory.UNAVAILABLE,
-            ErrorCode.DATABASE_UNAVAILABLE,
-            "El servicio no está disponible",
-        ),
-        (
-            DatabaseTimeout(),
-            ErrorCategory.TIMEOUT,
-            ErrorCode.DATABASE_TIMEOUT,
-            "El servicio tardó demasiado en responder",
-        ),
-    ],
-    ids=["no-disponible", "tiempo-agotado"],
-)
-def test_los_errores_de_la_base_declaran_categoria_codigo_y_mensaje(
-    error: DatabaseUnavailable | DatabaseTimeout, categoria: ErrorCategory, codigo: ErrorCode, mensaje: str
+@pytest.mark.parametrize("error", [DatabaseUnavailable(), DatabaseTimeout()], ids=["no-disponible", "tiempo-agotado"])
+def test_los_errores_de_la_base_son_internos_con_el_mensaje_por_defecto(
+    error: DatabaseUnavailable | DatabaseTimeout,
 ) -> None:
-    assert (error.category, error.error_code, error.message) == (categoria, codigo, mensaje)
+    assert (error.category, error.error_code) == (ErrorCategory.INTERNAL, ErrorCode.INTERNAL_ERROR)
+    assert error.message == "Ocurrió un error interno. Inténtalo más tarde."
     assert error.details is None
