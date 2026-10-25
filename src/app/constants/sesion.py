@@ -1,0 +1,12 @@
+SESSION_COOKIE_NAME = "gestion_sid"
+HOST_SESSION_COOKIE_NAME = "__Host-gestion_sid"
+SIGNED_COOKIE_PREFIX = "s:"
+COOKIE_PATH = "/"
+COOKIE_SAME_SITE = "strict"
+SESSION_INVALID_STATE_KEY = "sesion_invalida"
+LOGOUT_METHOD = "POST"
+LOGOUT_PATH = "/auth/logout"
+MAX_EMAIL_LENGTH = 254
+EPOCH_EXPIRES = "Thu, 01 Jan 1970 00:00:00 GMT"
+UUID_VERSIONS = range(1, 9)
+UUID_EXTREMES = frozenset({"00000000-0000-0000-0000-000000000000", "ffffffff-ffff-ffff-ffff-ffffffffffff"})

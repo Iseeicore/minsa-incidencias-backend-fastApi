@@ -148,6 +148,13 @@ def _response(request: Request, clock: Clock, payload: ErrorPayload) -> JSONResp
     )
 
 
+def domain_error_response(
+    request: Request, clock: Clock, error: DomainError, headers: dict[str, str] | None = None
+) -> JSONResponse:
+    status = HTTP_STATUS_BY_CATEGORY[error.category]
+    return _response(request, clock, ErrorPayload(status, error.error_code, error.message, error.details, headers))
+
+
 def register_error_handlers(app: FastAPI, clock: Clock) -> None:
     @app.exception_handler(DomainError)
     async def handle_domain_error(request: Request, error: DomainError) -> JSONResponse:

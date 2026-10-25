@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.catalogos.domain.plazo_de_categoria import PlazoDeCategoria
+    from app.shared.sesion import SesionActual
 
 AHORA_FIJA = datetime(2026, 10, 24, 12, 0, tzinfo=UTC)
 
@@ -13,6 +14,16 @@ class FixedClock:
 
     def now(self) -> datetime:
         return self._ahora
+
+
+class SesionesEnMemoria:
+    def __init__(self, sesiones: dict[str, SesionActual] | None = None) -> None:
+        self._sesiones = dict(sesiones or {})
+        self.consultas: list[str] = []
+
+    async def resolve(self, session_id: str) -> SesionActual | None:
+        self.consultas.append(session_id)
+        return self._sesiones.get(session_id)
 
 
 class StaticDatabaseProbe:

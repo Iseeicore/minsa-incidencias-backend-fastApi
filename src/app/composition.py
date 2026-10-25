@@ -17,16 +17,21 @@ from app.constants.http import (
 from app.constants.limits import CORS_MAX_AGE_SECONDS, JSON_BODY_LIMIT_BYTES
 from app.health.router import build_health_router
 from app.shared.body_limit import BodyLimitMiddleware
+from app.shared.csrf import CsrfMiddleware
 from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
+from app.shared.rate_limit import RateLimitMiddleware
 from app.shared.security_headers import SecurityHeadersMiddleware
+from app.shared.session_middleware import SessionMiddleware
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
+    from collections.abc import Callable
     from contextlib import AbstractAsyncContextManager
 
     from app.catalogos.application.listar_plazos import ListarPlazos
     from app.shared.clock import Clock
-    from app.shared.ports import DatabaseProbe
+    from app.shared.http_security import HttpSecurity
+    from app.shared.ports import DatabaseProbe, SessionResolver
+    from app.shared.token_bucket import TokenBucketLimiter
 
 type Lifespan = Callable[[FastAPI], AbstractAsyncContextManager[None]]
 
@@ -40,6 +45,9 @@ class Container:
     listar_plazos: ListarPlazos
     database_probe: DatabaseProbe
     clock: Clock
+    session_resolver: SessionResolver
+    limiter: TokenBucketLimiter
+    security: HttpSecurity
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,6 +74,15 @@ def create_v1_app(container: Container, *, docs_enabled: bool = False) -> FastAP
         openapi_url=urls.openapi,
     )
     register_error_handlers(app, container.clock)
+    app.add_middleware(
+        RateLimitMiddleware,
+        limiter=container.limiter,
+        policies=container.security.rate_limits,
+        clock=container.clock,
+        trust_proxy=container.security.trust_proxy,
+    )
+    app.add_middleware(SessionMiddleware, resolver=container.session_resolver, cookies=container.security.cookies)
+    app.add_middleware(CsrfMiddleware, allowed_origins=container.security.allowed_origins, clock=container.clock)
     app.add_middleware(UnexpectedErrorMiddleware, clock=container.clock)
     app.include_router(build_catalogos_router(container.listar_plazos))
     return app
@@ -76,7 +93,6 @@ def create_app(
     lifespan: Lifespan | None = None,
     *,
     docs_enabled: bool = False,
-    cors_origins: Sequence[str] = (),
 ) -> FastAPI:
     urls = DocumentationUrls.when(enabled=docs_enabled)
     app = FastAPI(
@@ -92,7 +108,7 @@ def create_app(
     app.add_middleware(BodyLimitMiddleware, max_bytes=JSON_BODY_LIMIT_BYTES)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=list(cors_origins),
+        allow_origins=list(container.security.allowed_origins),
         allow_credentials=True,
         allow_methods=CORS_ALLOWED_METHODS,
         allow_headers=CORS_ALLOWED_HEADERS,

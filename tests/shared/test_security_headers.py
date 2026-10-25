@@ -4,6 +4,7 @@ import pytest
 
 from tests.helpers.app_factory import un_cliente, un_contenedor
 from tests.helpers.fakes import RaisingPlazoRepository
+from tests.helpers.vectores import vectores_del_nodo
 
 ORIGEN = "https://app.minsa.gob.pe"
 RUTA = "/v1/catalogos/plazos"
@@ -15,12 +16,7 @@ class SondaQueFalla:
         raise RuntimeError(message)
 
 
-CABECERAS_DE_SEGURIDAD = {
-    "x-content-type-options": "nosniff",
-    "cache-control": "no-store",
-    "referrer-policy": "no-referrer",
-    "x-frame-options": "DENY",
-}
+CABECERAS_DE_SEGURIDAD = {**vectores_del_nodo()["helmet"], "cache-control": "no-store"}
 
 
 @pytest.mark.parametrize(
@@ -56,3 +52,12 @@ async def test_la_peticion_previa_de_cors_tambien_lleva_las_cabeceras_de_segurid
     assert respuesta.status_code == HTTPStatus.OK
     for nombre, valor in CABECERAS_DE_SEGURIDAD.items():
         assert respuesta.headers[nombre] == valor
+
+
+@pytest.mark.parametrize("ruta", ["/docs", "/redoc", "/openapi.json"])
+async def test_la_documentacion_no_lleva_la_politica_de_contenido(ruta: str) -> None:
+    async with un_cliente(un_contenedor(), docs_enabled=True) as cliente:
+        respuesta = await cliente.get(ruta)
+
+    assert "content-security-policy" not in respuesta.headers
+    assert respuesta.headers["x-content-type-options"] == "nosniff"

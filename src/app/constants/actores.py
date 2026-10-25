@@ -1,0 +1,7 @@
+ACTOR_SISTEMA_GESTION = "sistema:gestion"
+ACTOR_SISTEMA_CREAR_ADMIN = "sistema:crear-admin"
+ACTOR_SISTEMA_TIEMPO_REAL = "sistema:tiempo-real"
+ACTOR_SISTEMA_CLASIFICADOR = "sistema:clasificador"
+ACTOR_SISTEMA_USUARIO_PRUEBA = "sistema:script-prueba"
+ACTOR_SISTEMA_ARCHIVADOR = "sistema:archivador"
+ACTOR_USUARIO_INTERNO_PREFIX = "usuario:"
