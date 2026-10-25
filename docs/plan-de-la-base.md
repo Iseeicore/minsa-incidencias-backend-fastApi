@@ -40,7 +40,7 @@ Base genérica de un backend FastAPI con arquitectura hexagonal y DDD, construid
 | 4 | Hecho: imagen verificada desde `git archive` con `docker build --no-cache --pull` | BC34 |
 | 5 | Hecho: `.github/workflows/ci.yml` y `.gitlab-ci.yml` con `poe verificar`, sin caché; falta correrlos en GitHub y GitLab, que exige subir el repo | BC23 |
 | 6 | Hecho: README mínimo | BC37 |
-| 7 | Primer commit y columna Commit de las mediciones | BC12 |
+| 7 | Hecho: primer commit (`91735db`) y columna Commit de las mediciones | BC12 |
 | 9 | Hecho: carpetas puras (`constants`, `enums`, `errors`), un enum y un error por archivo, textos y regex aislados, con pruebas guardianas | BA36, BA56, BA62, BA65, BA67 |
 | 8 | Pendientes de la auditoría, diferidos a propósito: clave de idempotencia en `POST` (BA151), fijar `actions/checkout` por SHA, entidad devuelta al controlador (BA02) | BA151, BA02 |
 
