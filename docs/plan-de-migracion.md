@@ -20,7 +20,11 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 14. Las reglas de los disparadores se traducen por fragmento de mensaje a 409 (conflicto) o 422 (regla corregible) en `shared/reglas_de_la_base.py`. La tabla completa (33 reglas) ya está cargada aunque las de incidencias se ejercitan en la Fase 5.
 15. La cobertura mínima de las pruebas unitarias (98 %) no mide `adapters/persistence/`: esos adaptadores se miden con las pruebas de integración contra el esquema del bot. Con ambas tandas la cobertura total es 99,9 %.
 16. Fuera de esta fase queda el cierre de conexiones en vivo al desactivar o cambiar a un usuario (`seguimiento.invalidarUsuario` del Node); llega con la Fase 8.
-17. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
+17. Las consultas de `incidencias` se arman con fragmentos fijos y valores siempre como parámetros enlazados (`ParametrosSql`), igual que el Node arma su SQL dinámico; solo se agregan las condiciones de los filtros recibidos para que el plan de consulta sea el mismo. Todo valor lleva `CAST(... AS tipo)` porque el `::` pegado a un marcador no se reconoce bajo SQLAlchemy.
+18. Los cursores son los del Node: base64url de `fechaISO|id` (listado) o `por-vencer|vence-en|fechaISO|id` (por vencer), con la fecha en UTC y milisegundos. Las fechas con microsegundos se truncan a milisegundos al codificar, como hace el Node al leerlas.
+19. La matriz de acciones por rol (confirmar, corregir, derivar, tomar, resolver, archivar, reabrir) ya vive en `shared/permisos.py` porque el detalle y el listado informan las acciones permitidas; las siete acciones HTTP llegan con la Fase 5. La visibilidad de `consulta_ipress` y de derivaciones (`VisibilidadConsulta`) llega con la Fase 6.
+20. La imagen de una evidencia se entrega solo si la ruta es un data URI `data:image/{jpeg|png|webp};base64,` con base64 canónico; si no, responde 404 `EVIDENCIA_NO_DISPONIBLE`. Sus cabeceras (`Cache-Control: private, no-store`, CSP `default-src 'none'; sandbox`) reemplazan a las generales.
+21. Las pruebas de integración usan una base plantilla ya migrada con el esquema del bot (`TEST_TEMPLATE_DATABASE`, por defecto `bd_plantilla_desechable`); cada prueba crea su base con `CREATE DATABASE … TEMPLATE …`. Nada del esquema se copia a este repositorio.
 
 ## Fases
 
@@ -29,8 +33,8 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 | 0 | Preparación: contrato de referencia, base plantilla, sustitución del ejemplo por el contexto `catalogos` con `GET /v1/catalogos/plazos` | Hecha (PR #1) |
 | 1 | Contrato de errores del Node (`success`, 400 de validación, 404 por método, los 18 códigos) | Hecha (PR #2) |
 | 2 | Infraestructura transversal: actor y transacción, cookie firmada, sesión, CSRF, limitador, cabeceras | Hecha (PR #3) |
-| 3 | `acceso` y `usuarios`, y `GET /areas` | Hecha en su rama |
-| 4 | `incidencias`, lectura y evidencias | Pendiente |
+| 3 | `acceso` y `usuarios`, y `GET /areas` | Hecha (PR #4) |
+| 4 | `incidencias`, lectura y evidencias | Hecha en su rama |
 | 5 | `incidencias`, las siete acciones | Pendiente |
 | 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Pendiente |
 | 7 | Archivador y clasificador | Pendiente |

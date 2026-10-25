@@ -85,7 +85,7 @@ src/app/
   errors/            una clase de error por archivo, con el nombre del archivo igual al de la clase
   health/            rutas /salud y /salud/listo
   shared/            núcleo compartido sin negocio: errores, reloj, logs, base, errores HTTP
-  <contexto>/        un contexto delimitado (hoy: catalogos, acceso, usuarios)
+  <contexto>/        un contexto delimitado (hoy: catalogos, acceso, usuarios, incidencias)
     domain/          reglas de negocio puras y síncronas; sin frameworks ni drivers (errors/ propios, constantes y patrones)
     application/     casos de uso y puertos (protocolos); no conocen HTTP ni SQL
     adapters/
