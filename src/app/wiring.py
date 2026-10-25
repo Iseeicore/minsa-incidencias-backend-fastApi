@@ -13,6 +13,7 @@ from app.composition import Container
 from app.constants.limits import MS_PER_SECOND
 from app.constants.sesion import SECONDS_PER_HOUR
 from app.enums.node_env import NodeEnv
+from app.filtro_corrupcion.application.evaluar_corrupcion import EvaluarCorrupcion
 from app.incidencias.adapters.persistence.analisis import SqlAnalisisReader
 from app.incidencias.adapters.persistence.derivaciones import SqlDerivacionReader
 from app.incidencias.adapters.persistence.escritura import SqlIncidenciaUnitOfWork
@@ -117,6 +118,7 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         consultar_derivacion=ConsultarDerivacion(derivaciones, consultar_incidencia),
         contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
         consultar_analisis=ConsultarAnalisis(incidencias, SqlAnalisisReader(engine)),
+        evaluar_corrupcion=EvaluarCorrupcion(),
         obtener_indicadores=obtener_indicadores,
         listar_ipress=ListarIpress(ipress),
         resumen_de_ipress=ObtenerResumenDeIpress(ipress, indicadores),

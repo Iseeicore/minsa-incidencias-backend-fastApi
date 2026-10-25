@@ -7,7 +7,7 @@ from fastapi import Depends, FastAPI
 
 from app.enums.rol_codigo import RolCodigo
 from app.enums.vista_codigo import VistaCodigo
-from app.shared.auth_deps import require_session, require_vista_y_rol
+from app.shared.auth_deps import require_rol, require_session, require_vista_y_rol
 from app.shared.http_errors import register_error_handlers
 from app.shared.sesion import SesionActual
 from tests.helpers.app_minima import un_cliente_de
@@ -105,5 +105,41 @@ async def test_con_el_rol_pero_sin_la_vista_responde_403() -> None:
 async def test_sin_sesion_el_acceso_a_derivaciones_responde_401() -> None:
     async with un_cliente_de(una_app_con_acceso_a_derivaciones()) as cliente:
         respuesta = await cliente.get("/seguimiento")
+
+    assert respuesta.status_code == HTTPStatus.UNAUTHORIZED
+
+
+def una_app_con_acceso_por_rol() -> FastAPI:
+    app = FastAPI()
+    register_error_handlers(app, FixedClock())
+
+    @app.get("/por-rol")
+    async def por_rol(
+        sesion: Annotated[SesionActual, Depends(require_rol(RolCodigo.OTRANS, RolCodigo.ADMINISTRADOR))],
+    ) -> dict[str, str]:
+        return {"correo": sesion.correo}
+
+    return app
+
+
+@pytest.mark.parametrize("roles", [("OTRANS",), ("ADMINISTRADOR",), ("GESTOR", "OTRANS")])
+async def test_con_uno_de_los_roles_pasa(roles: tuple[str, ...]) -> None:
+    async with un_cliente_de(SesionDePrueba(una_app_con_acceso_por_rol(), una_sesion(roles=roles))) as cliente:
+        respuesta = await cliente.get("/por-rol")
+
+    assert respuesta.status_code == HTTPStatus.OK
+
+
+@pytest.mark.parametrize("roles", [("GESTOR",), ("ESTABLECIMIENTO",), ()])
+async def test_sin_ninguno_de_los_roles_responde_403(roles: tuple[str, ...]) -> None:
+    async with un_cliente_de(SesionDePrueba(una_app_con_acceso_por_rol(), una_sesion(roles=roles))) as cliente:
+        respuesta = await cliente.get("/por-rol")
+
+    assert respuesta.status_code == HTTPStatus.FORBIDDEN
+
+
+async def test_sin_sesion_el_acceso_por_rol_responde_401() -> None:
+    async with un_cliente_de(una_app_con_acceso_por_rol()) as cliente:
+        respuesta = await cliente.get("/por-rol")
 
     assert respuesta.status_code == HTTPStatus.UNAUTHORIZED

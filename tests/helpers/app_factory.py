@@ -7,6 +7,7 @@ from app.acceso.application.iniciar_sesion import IniciarSesion
 from app.catalogos.application.listar_areas import ListarAreas
 from app.catalogos.application.listar_plazos import ListarPlazos
 from app.composition import Container, create_app
+from app.filtro_corrupcion.application.evaluar_corrupcion import EvaluarCorrupcion
 from app.incidencias.application.consulta_de_ipress import (
     ConsultarIncidenciaDeIpress,
     ContarIncidenciasDeIpress,
@@ -111,6 +112,7 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
         consultar_derivacion=ConsultarDerivacion(envios, consultar_incidencia),
         contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
         consultar_analisis=ConsultarAnalisis(casos, analisis or AnalisisEnMemoria()),
+        evaluar_corrupcion=EvaluarCorrupcion(),
         obtener_indicadores=obtener_indicadores,
         listar_ipress=ListarIpress(buscador_de_ipress),
         resumen_de_ipress=ObtenerResumenDeIpress(buscador_de_ipress, lector_de_indicadores),

@@ -41,3 +41,12 @@ def require_vista_y_rol(vista: VistaCodigo, *roles: RolCodigo) -> Callable[[Sesi
         return sesion
 
     return dependency
+
+
+def require_rol(*roles: RolCodigo) -> Callable[[SesionActual], SesionActual]:
+    def dependency(sesion: Annotated[SesionActual, Depends(require_session)]) -> SesionActual:
+        if not any(rol in sesion.roles for rol in roles):
+            raise SinPermiso
+        return sesion
+
+    return dependency

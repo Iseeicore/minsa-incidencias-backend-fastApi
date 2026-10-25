@@ -45,6 +45,7 @@ async def test_la_especificacion_v1_declara_la_version_del_contrato_y_su_prefijo
         "/derivaciones/conteos",
         "/derivaciones/{codigo}",
         "/derivaciones/{codigo}/evidencias/{evidenciaId}/contenido",
+        "/filtro-corrupcion/evaluar",
         "/incidencias",
         "/incidencias/conteos",
         "/incidencias/por-vencer",

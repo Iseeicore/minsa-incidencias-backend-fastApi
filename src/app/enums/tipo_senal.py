@@ -1,0 +1,13 @@
+from enum import StrEnum
+
+
+class TipoSenal(StrEnum):
+    FUERTE = "FUERTE"
+    MEDIA = "MEDIA"
+    DEBIL = "DEBIL"
+    NEGATIVA_DECISIVA = "NEGATIVA_DECISIVA"
+    NEGATIVA_LEVE = "NEGATIVA_LEVE"
+    ACTOR = "ACTOR"
+    ENTIDAD = "ENTIDAD"
+    NOMBRE_TITULAR = "NOMBRE_TITULAR"
+    UBICACION = "UBICACION"
