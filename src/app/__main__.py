@@ -1,25 +1,44 @@
 import asyncio
 import selectors
 import sys
+from importlib import import_module
+from typing import TYPE_CHECKING
 
 import uvicorn
 
 from app.clasificador_externo import ejecutar_clasificador
 from app.config.settings import get_settings
+from app.constants.limits import APAGADO_TIMEOUT_SEGUNDOS
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from types import FrameType
 
 COMANDO_CLASIFICADOR = "clasificador"
 OPCION_UNA_VEZ = "--una-vez"
 
 
+class ServidorConCierreDeEventos(uvicorn.Server):
+    def __init__(self, config: uvicorn.Config, cerrar_eventos: Callable[[], None]) -> None:
+        super().__init__(config)
+        self._cerrar_eventos = cerrar_eventos
+
+    def handle_exit(self, sig: int, frame: FrameType | None) -> None:
+        self._cerrar_eventos()
+        super().handle_exit(sig, frame)
+
+
 def servir() -> None:
+    app = import_module("app.main").app
     settings = get_settings()
     config = uvicorn.Config(
-        "app.main:app",
+        app,
         host="0.0.0.0",  # noqa: S104
         port=settings.port,
         proxy_headers=settings.trust_proxy,
+        timeout_graceful_shutdown=APAGADO_TIMEOUT_SEGUNDOS,
     )
-    server = uvicorn.Server(config)
+    server = ServidorConCierreDeEventos(config, app.state.cerrar_eventos)
     if sys.platform == "win32":
         asyncio.run(server.serve(), loop_factory=lambda: asyncio.SelectorEventLoop(selectors.SelectSelector()))
     else:

@@ -32,7 +32,11 @@ class SessionMiddleware:
         state = scope.setdefault("state", {})
         if sesion is not None:
             state[SESSION_STATE_KEY] = sesion
-            await self._app(scope, receive, send)
+            try:
+                await self._app(scope, receive, send)
+            finally:
+                if sesion.control_eventos is not None:
+                    sesion.control_eventos.liberar()
             return
         state[SESSION_INVALID_STATE_KEY] = True
 

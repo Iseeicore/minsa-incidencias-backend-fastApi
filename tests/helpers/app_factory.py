@@ -7,6 +7,8 @@ from app.acceso.application.iniciar_sesion import IniciarSesion
 from app.catalogos.application.listar_areas import ListarAreas
 from app.catalogos.application.listar_plazos import ListarPlazos
 from app.composition import Container, create_app
+from app.eventos.application.suscribirse_a_eventos import SuscribirseAEventos
+from app.eventos.domain.centro_de_eventos import CentroDeEventos
 from app.filtro_corrupcion.application.evaluar_corrupcion import EvaluarCorrupcion
 from app.incidencias.application.consulta_de_ipress import (
     ConsultarIncidenciaDeIpress,
@@ -47,6 +49,7 @@ from tests.helpers.acceso_en_memoria import (
 from tests.helpers.analisis_en_memoria import AnalisisEnMemoria
 from tests.helpers.builders import los_plazos_del_catalogo, una_seguridad, una_sesion
 from tests.helpers.derivaciones_en_memoria import DerivacionesEnMemoria
+from tests.helpers.eventos_en_memoria import TiempoManual
 from tests.helpers.fakes import (
     FixedClock,
     InMemoryPlazoRepository,
@@ -56,6 +59,7 @@ from tests.helpers.fakes import (
 )
 from tests.helpers.incidencias_en_memoria import IncidenciasEnMemoria
 from tests.helpers.indicadores_en_memoria import IndicadoresEnMemoria, IpressEnMemoria
+from tests.helpers.registro_en_memoria import RegistroEnMemoria
 from tests.helpers.sesion import SesionDePrueba
 from tests.helpers.usuarios_en_memoria import UsuariosEnMemoria
 
@@ -77,6 +81,7 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
     indicadores: IndicadoresEnMemoria | None = None,
     ipress: IpressEnMemoria | None = None,
     analisis: AnalisisEnMemoria | None = None,
+    suscribirse: SuscribirseAEventos | None = None,
 ) -> Container:
     plazos = repositorio or InMemoryPlazoRepository(los_plazos_del_catalogo())
     almacen = usuarios or UsuariosEnMemoria()
@@ -113,6 +118,7 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
         contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
         consultar_analisis=ConsultarAnalisis(casos, analisis or AnalisisEnMemoria()),
         evaluar_corrupcion=EvaluarCorrupcion(),
+        suscribirse_a_eventos=suscribirse or SuscribirseAEventos(CentroDeEventos(TiempoManual(), RegistroEnMemoria())),
         obtener_indicadores=obtener_indicadores,
         listar_ipress=ListarIpress(buscador_de_ipress),
         resumen_de_ipress=ObtenerResumenDeIpress(buscador_de_ipress, lector_de_indicadores),

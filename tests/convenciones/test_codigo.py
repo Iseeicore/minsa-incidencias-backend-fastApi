@@ -22,6 +22,8 @@ ESPEJO_SIN_PRUEBA_PROPIA = {
     "clasificador_externo.py": "proceso externo del clasificador; lo ejercita tests/test_clasificador_externo.py",
     "filtro_corrupcion/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "archivador/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "eventos/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "eventos/domain/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "filtro_corrupcion/adapters/persistence/sentencias_del_clasificador.py": "solo sentencias SQL; las cubre test_clasificador.py",
     "config/settings.py": "su prueba vive en tests/config/test_settings.py",
     "catalogos/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",

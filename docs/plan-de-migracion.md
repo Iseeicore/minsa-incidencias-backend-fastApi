@@ -50,6 +50,14 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 42. El archivador toma `pg_try_advisory_xact_lock` en cada transacción: si otra instancia lo tiene, la pasada devuelve 0. Es un cinturón sobre el worker único que el Node no tiene.
 43. Corpus de oro del clasificador: `tests/fixtures/corpus_clasificacion_node.json` guarda 640 casos (de 905 generados) con categoría, confianza, motivo, versión y señales guardadas del motor real del Node. Los enteros se escriben sin decimales, como `JSON.stringify`, y una prueba lo comprueba. Además se comparó una vez con el Node sobre dos bases gemelas: 144 casos clasificados por cada lado, 48 con apoyo de antecedentes, sin ninguna diferencia.
 44. Diferencias menores con el Node: el resumen del ciclo no lleva `degradadas` (sin modelo siempre es cero) y los registros conservan el texto del Node con los campos en `snake_case`.
+45. `eventos` es un contexto propio. Los puertos `ControlDeSesion` y `SeguimientoDeSesiones` viven en el núcleo para que `acceso` y `usuarios` avisen sin importar `eventos`; el centro de eventos los implementa y el cableado los une.
+46. El centro es de dominio puro y síncrono: los temporizadores entran por un puerto (`TiempoDeEventos`), con el reloj de `asyncio` en producción y un reloj manual en las pruebas. La lectura de las categorías por rol, con una caché de 5 minutos que comparte la lectura en vuelo y se olvida si falla, es de aplicación.
+47. Cada petición autenticada abre una verificación en el centro y el middleware la libera al terminar la respuesta, como el Node: si la sesión o el usuario se invalidan mientras se resuelve la cookie, la petición no obtiene sesión.
+48. El flujo es un `StreamingResponse` con las cabeceras exactas del Node (el tipo sin `charset`). La baja se registra en el generador y también como tarea de fondo de la respuesta, por si el cliente se va antes de que empiece a leerse.
+49. Apagado: uvicorn espera a las conexiones abiertas y un flujo nunca termina solo, así que `python -m app` arranca el servidor con una subclase que cierra los flujos al recibir la señal, con un tope de 10 s como respaldo. Por eso ahora importa la aplicación ya creada en lugar de pasar su nombre como texto.
+50. El disparador de NOTIFY lo instala la aplicación al arrancar, bajo `pg_advisory_xact_lock`, como el Node; si falla, el servidor no arranca. La función es la del Node sin comentarios y con el mismo marcador de versión, así que los dos backends se reconocen y no se pisan.
+51. Diferencia: el vencimiento de la sesión no se parte en tramos para evitar el desborde de 2^31 ms del temporizador de JavaScript, porque `asyncio` no tiene ese límite.
+52. Doble backend: el servidor del Node y el de Python, cada uno sobre su base gemela, dieron el mismo código al iniciar sesión, el mismo 401 sin sesión, las mismas cabeceras y los mismos bytes del flujo (`retry`, `cambio` tras un caso nuevo y `sesion` al cerrar sesión). Con esto, las 37 operaciones de `v1.json` están implementadas.
 
 ## Fases
 
@@ -62,8 +70,8 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 | 4 | `incidencias`, lectura y evidencias | Hecha (PR #5) |
 | 5 | `incidencias`, las siete acciones | Hecha (PR #6) |
 | 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Hecha (PR #7) |
-| 7 | Archivador y clasificador | Hecha en su rama |
-| 8 | Eventos en tiempo real (SSE con LISTEN/NOTIFY) | Pendiente |
+| 7 | Archivador y clasificador | Hecha (PR #8) |
+| 8 | Eventos en tiempo real (SSE con LISTEN/NOTIFY) | Hecha en su rama |
 | 9 | Cierre: auditoría contra `v1.json`, documentación, variables para Infraestructura | Pendiente |
 
 Criterio de salida de cada fase: `poe verificar` en verde, cobertura que no baja del umbral, contratos de capas sin romper, guardianas en verde y pruebas de paridad del corte en verde.
