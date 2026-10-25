@@ -62,7 +62,7 @@ Las pruebas de integración necesitan dos cosas: `TEST_DATABASE_URL`, un servido
 
 ```
 docker run -d --name pg-pruebas -e POSTGRES_USER=pruebas -e POSTGRES_PASSWORD=CLAVE -p 127.0.0.1:55432:5432 postgres:16
-# preparar bd_plantilla_desechable con las migraciones, funciones, disparadores y semillas del bot
+BOT_PRISMA_DIR=RUTA/minsa-citas-whatsapp-bot/prisma TEST_DATABASE_URL=postgresql://pruebas:CLAVE@127.0.0.1:55432/postgres uv run poe plantilla
 TEST_DATABASE_URL=postgresql://pruebas:CLAVE@127.0.0.1:55432/postgres uv run poe test-integration
 ```
 

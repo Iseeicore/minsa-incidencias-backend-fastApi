@@ -60,6 +60,7 @@ max-branches = 8
 max-complexity = 8
 
 [tool.ruff.lint.per-file-ignores]
+"scripts/**" = ["INP001"]
 "tests/**" = ["S101", "S105", "S106", "PLR2004", "INP001", "TC001", "TC002", "TC003"]
 
 [tool.mypy]
@@ -144,4 +145,5 @@ test-integration = "pytest -m integration"
 build = "uv build --wheel"
 audit = "pip-audit"
 hooks = "lefthook install"
+plantilla = "python scripts/preparar_plantilla.py"
 verificar = ["typecheck", "lint", "layers", "format-check", "test-coverage", "build", "audit"]
