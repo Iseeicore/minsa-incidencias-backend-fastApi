@@ -1,5 +1,5 @@
 from app.constants.normas import FRAGMENTOS_DE_NORMAS
-from app.incidencias.domain.normas import FragmentoNorma, fragmento_de, fragmentos_por_id
+from app.shared.normas import FragmentoNorma, fragmento_de, fragmentos_por_id
 
 
 def test_los_fragmentos_de_normas_son_los_29_del_node_con_identificadores_unicos() -> None:
