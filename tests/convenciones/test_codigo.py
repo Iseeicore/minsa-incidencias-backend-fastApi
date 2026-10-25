@@ -17,9 +17,13 @@ COMPOSICION = SRC / "composition.py"
 ESPEJO_SIN_PRUEBA_PROPIA = {
     "composition.py": "lo cubren las pruebas de test_composition.py y de los routers",
     "main.py": "arranque real; excluido de la cobertura por BC21",
+    "wiring.py": "lo cubre tests/test_wiring.py con una base real",
     "__main__.py": "punto de entrada del contenedor; excluido de la cobertura por BC21",
     "config/settings.py": "su prueba vive en tests/config/test_settings.py",
     "catalogos/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "acceso/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "usuarios/application/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
+    "usuarios/adapters/persistence/consultas.py": "solo consultas SQL; las cubre test_repository.py",
     "shared/sesion.py": "contenedor de datos cubierto por tests/shared/test_auth_deps.py",
     "shared/ports.py": "solo protocolos; mypy comprueba su cumplimiento",
     "catalogos/adapters/http/schemas.py": "los cubren test_router.py y test_contract.py",

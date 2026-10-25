@@ -1,6 +1,8 @@
 from collections.abc import AsyncIterator
 from http import HTTPStatus
 
+from starlette.types import Message, Receive, Scope, Send
+
 from app.composition import create_app
 from app.shared.body_limit import BodyLimitMiddleware
 from tests.helpers.app_factory import un_contenedor
@@ -52,3 +54,37 @@ def test_la_aplicacion_real_monta_el_limite_de_cuerpo() -> None:
         isinstance(middleware.cls, type) and issubclass(middleware.cls, BodyLimitMiddleware)
         for middleware in app.user_middleware
     )
+
+
+async def test_un_alcance_que_no_es_http_pasa_sin_tocar_nada() -> None:
+    alcances: list[str] = []
+
+    async def app(scope: Scope, receive: Receive, send: Send) -> None:  # noqa: ARG001
+        alcances.append(scope["type"])
+
+    async def receive() -> Message:
+        return {"type": "lifespan.startup"}
+
+    async def send(message: Message) -> None:
+        raise AssertionError(message)
+
+    await BodyLimitMiddleware(app, max_bytes=10)({"type": "lifespan"}, receive, send)
+
+    assert alcances == ["lifespan"]
+
+
+async def test_un_mensaje_que_no_es_de_cuerpo_no_cuenta_para_el_limite() -> None:
+    recibidos: list[str] = []
+
+    async def app(scope: Scope, receive: Receive, send: Send) -> None:  # noqa: ARG001
+        recibidos.append((await receive())["type"])
+
+    async def receive() -> Message:
+        return {"type": "http.disconnect"}
+
+    async def send(message: Message) -> None:
+        raise AssertionError(message)
+
+    await BodyLimitMiddleware(app, max_bytes=10)({"type": "http", "headers": []}, receive, send)
+
+    assert recibidos == ["http.disconnect"]

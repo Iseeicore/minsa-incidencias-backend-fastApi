@@ -46,6 +46,12 @@ def rate_limit_headers(result: TakeResult) -> dict[str, str]:
     return {RATE_LIMIT_LIMIT_HEADER: str(result.limit), RATE_LIMIT_REMAINING_HEADER: str(result.remaining)}
 
 
+def rate_limited(result: TakeResult) -> DemasiadasPeticiones:
+    error = DemasiadasPeticiones()
+    error.headers = {**rate_limit_headers(result), RETRY_AFTER_HEADER: str(result.retry_after_seconds)}
+    return error
+
+
 class RateLimitMiddleware:
     def __init__(
         self,
@@ -79,7 +85,7 @@ class RateLimitMiddleware:
             if message["type"] == "http.response.start":
                 response_headers = MutableHeaders(scope=message)
                 for name, value in headers.items():
-                    response_headers[name] = value
+                    response_headers.setdefault(name, value)
             await send(message)
 
         await self._app(scope, receive, send_with_headers)

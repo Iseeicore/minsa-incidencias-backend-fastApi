@@ -1,0 +1,14 @@
+[
+  {
+    "clave": "clave-de-prueba-1",
+    "hash": "$argon2id$v=19$m=65536,p=4,t=3$FCgHQeooyTUx6PtwGysfgQ$H6VcyosvgZuERT5POTsiOPOmlXXLPy4LqHbyHnH9Wdw"
+  },
+  {
+    "clave": "Ñandú 😀 ñ",
+    "hash": "$argon2id$v=19$m=65536,p=4,t=3$IGKkOrw+ZymfVq7Od0oS0g$a0kURT7mt3PDf/U/p2I0A5jIRE6vTQTzUwRpvKyNmhc"
+  },
+  {
+    "clave": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+    "hash": "$argon2id$v=19$m=65536,p=4,t=3$ngKF2Gwg5ikTLjakmspBEg$Yishdv40Tely7k0HEsUAABgQqDi0dnXpsMzXvUVKC4A"
+  }
+]

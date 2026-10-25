@@ -10,7 +10,7 @@ from starlette.types import Message, Receive, Scope, Send
 from app.enums.error_category import ErrorCategory
 from app.enums.error_code import ErrorCode
 from app.errors.domain_error import DomainError
-from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
+from app.shared.http_errors import UnexpectedErrorMiddleware, _validation_details, register_error_handlers
 from app.shared.logging import configure_logging
 from tests.helpers.app_factory import un_cliente, un_contenedor
 from tests.helpers.app_minima import un_cliente_de, una_app_minima
@@ -219,3 +219,19 @@ async def test_un_error_http_del_servidor_lanzado_a_mano_se_registra_y_no_filtra
     assert respuesta.json()["message"] == "Ocurrió un error interno. Inténtalo más tarde."
     assert "detalle interno" not in respuesta.text
     assert len(registros) == 1
+
+
+def test_los_detalles_de_validacion_quitan_solo_el_prefijo_de_ubicacion() -> None:
+    errores = [
+        {"loc": ("body", "correo"), "msg": "uno", "type": "x"},
+        {"loc": ("query", "limite"), "msg": "dos", "type": "x"},
+        {"loc": ("campo", "interno"), "msg": "tres", "type": "x"},
+        {"loc": (), "msg": "cuatro", "type": "x"},
+    ]
+
+    assert _validation_details(errores) == [  # type: ignore[arg-type]
+        {"path": "correo", "message": "uno"},
+        {"path": "limite", "message": "dos"},
+        {"path": "campo.interno", "message": "tres"},
+        {"path": "", "message": "cuatro"},
+    ]

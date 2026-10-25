@@ -1,0 +1,8 @@
+MENSAJE_USUARIO_NO_ENCONTRADO = "El usuario solicitado no existe."
+MENSAJE_ROL_NO_ASIGNABLE = "No puedes asignar ese rol."
+MENSAJE_SIN_AREA_PROPIA = "Tu usuario no tiene un establecimiento asignado: no puedes gestionar usuarios."
+MENSAJE_AREA_OBLIGATORIA = "Indica el área del usuario."
+MENSAJE_ADMINISTRADOR_SIN_AREA = "El administrador no pertenece a un área: no indiques el área."
+MENSAJE_AREA_INVALIDA = "El área no existe o está desactivada."
+MENSAJE_AREA_NO_PERMITIDA = "Solo el administrador cambia el área de un usuario."
+MENSAJE_REVOCACION_FALLIDA = "no se pudo revocar la sesión en la base; la cookie se borró igual"
