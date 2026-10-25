@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING
 from sqlalchemy import text
 
 from app.catalogos.domain.area_listada import AreaListada, EstablecimientoDeArea
-from app.catalogos.domain.codigo_renipress import codigo_renipress_buscado
 from app.enums.tipo_area import TipoArea
+from app.shared.codigo_renipress import codigo_renipress_buscado
 from app.shared.database import translate_database_errors
 from app.shared.text_search import like_pattern
 

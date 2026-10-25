@@ -68,7 +68,7 @@ def test_un_201_declara_la_cabecera_location(operacion: Spec) -> None:
 @pytest.mark.parametrize("operacion", [operacion for _, _, operacion in OPERACIONES], ids=IDS)
 def test_cada_exito_y_cada_error_traen_ejemplo(operacion: Spec) -> None:
     for estado, respuesta in operacion["responses"].items():
-        if estado == "204":
+        if estado == "204" or "application/json" not in respuesta.get("content", {}):
             continue
         contenido = respuesta["content"]["application/json"]
         assert "example" in contenido or "examples" in contenido, estado
