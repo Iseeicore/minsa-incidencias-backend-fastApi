@@ -65,6 +65,14 @@ El clasificador toma de la cola los casos registrados sin categoría de la IA, d
 
 Los dos cierran ordenadamente: esperan al ciclo en curso antes de soltar la conexión.
 
+## Eventos en vivo
+
+`GET /v1/eventos` abre un flujo `text/event-stream` para que el tablero, la bandeja y la campana se actualicen solos. El flujo empieza con `retry: 5000`, emite `cambio` cuando cambia un caso que la sesión ve (agrupando las ráfagas de 1 s), emite `sesion` y se cierra cuando la sesión se invalida o vence, y envía el comentario `: latido` cada 25 s. Ningún evento lleva datos del caso: el cliente vuelve a consultar.
+
+Admite 3 flujos por usuario y 500 por proceso. El servidor escucha los cambios con `LISTEN` en una conexión propia a PostgreSQL y, al arrancar, instala el disparador que avisa de ellos (idempotente y bajo un candado de la base); si la escucha se pierde, reintenta cada 5 s y avisa a todos al volver. Al apagarse, cierra los flujos antes de esperar a los clientes.
+
+El conteo de flujos y el limitador de peticiones son por proceso: se corre un solo proceso por contenedor.
+
 ## Pruebas contra la base y hooks
 
 Las pruebas de integración necesitan dos cosas: `TEST_DATABASE_URL`, un servidor PostgreSQL 16 desechable donde el usuario pueda crear bases, y una **base plantilla** ya migrada con el esquema del bot, cuyo nombre (por defecto `bd_plantilla_desechable`, o el de `TEST_TEMPLATE_DATABASE`) debe terminar en `_desechable`, `_dev` o `_local`. Cada prueba crea su propia base con `CREATE DATABASE … TEMPLATE …` y la borra al terminar. El pre-push las corre (BT16), así que sin `TEST_DATABASE_URL` el push se detiene con un mensaje claro.
