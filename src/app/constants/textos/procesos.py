@@ -1,0 +1,8 @@
+EVENTO_CICLO_DEL_CLASIFICADOR = "Ciclo del clasificador"
+EVENTO_ALARMA_SIN_CLASIFICAR = "ALARMA: incidencias sin clasificar por más del umbral"
+EVENTO_FALLO_EL_CICLO_DEL_CLASIFICADOR = "Falló el ciclo del clasificador"
+EVENTO_CLASIFICADOR_INICIADO = "Clasificador iniciado"
+EVENTO_CLASIFICADOR_DETENIDO = "Clasificador detenido"
+EVENTO_CLASIFICADOR_SE_DETUVO_POR_UN_ERROR = "El clasificador se detuvo por un error"
+EVENTO_ARCHIVADO_COMPLETADO = "archivado automático de incidencias completado"
+EVENTO_FALLO_EL_ARCHIVADO = "falló el archivado automático de incidencias"

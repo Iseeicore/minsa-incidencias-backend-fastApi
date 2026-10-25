@@ -41,6 +41,15 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 33. El índice de coincidencias filtra los candidatos por la segunda palabra y conserva el orden: un texto de 5000 caracteres que repite «si» pasó de 7,7 s a 0,2 s sin cambiar ningún resultado.
 34. Corpus de oro del filtro: `tests/fixtures/corpus_corrupcion_node.json` guarda 835 casos (texto, contexto, `pesoIa` y respuesta) evaluados por el motor real del Node. Se generaron con textos armados desde el léxico y el catálogo, más 15 bordes (vacío, blancos, emojis, 5000 caracteres). Cubre las dos vías de propuesta, la zona gris, el acoso, el titular nombrado y la ubicación. Una prueba exige igualdad exacta.
 35. Con la Fase 6, 36 de las 37 operaciones de `v1.json` están implementadas con su mismo `operationId`; falta solo `GET /eventos` (Fase 8).
+36. El archivador y el clasificador son procesos de fondo sin HTTP. El archivador es un contexto propio (`archivador`) que llama a las dos funciones de la base. El clasificador vive dentro de `filtro_corrupcion` porque usa su motor y el contrato de independencia impide importarlo desde otro contexto. Los fragmentos de normas pasaron a `shared/normas.py` por la misma razón.
+37. El clasificador necesita el filtro de queja y reclamo, que el plan no listaba: se migró en esta fase. Su léxico (132 frases) y el mapa de señales a normas (14 temas) son datos generados desde el Node.
+38. Sin Ollama, el clasificador migrado es el algorítmico `coincidencias-v1`: reglas de corrupción, señales de queja y reclamo y apoyo de los antecedentes humanos por semejanza (`pg_trgm`). La versión guardada es `<versión de reglas>+coincidencias-v1`; `modelo` y `decision.pesoIa` quedan nulos, como en el Node sin modelo.
+39. El dominio es síncrono por una guardiana: la clasificación se parte en `clasificar_por_reglas` y `aplicar_coincidencias`, y la aplicación espera al buscador de antecedentes. El buscador solo se consulta si las reglas no piden revisión de OTRANS.
+40. `CicloPeriodico` ejecuta el ciclo de inmediato y luego cada intervalo; `detener` espera al ciclo en curso, como el `detener()` del Node. `ProcesosDeFondo` agrupa los ciclos y arranca y se detiene con el `lifespan`, antes de cerrar el motor.
+41. `CLASIFICADOR_MODO=externo` (el valor por defecto) no arranca el clasificador dentro del servidor. `python -m app clasificador` lo corre como proceso aparte y `--una-vez` hace una sola pasada; sale con código 1 si se detiene por un error.
+42. El archivador toma `pg_try_advisory_xact_lock` en cada transacción: si otra instancia lo tiene, la pasada devuelve 0. Es un cinturón sobre el worker único que el Node no tiene.
+43. Corpus de oro del clasificador: `tests/fixtures/corpus_clasificacion_node.json` guarda 640 casos (de 905 generados) con categoría, confianza, motivo, versión y señales guardadas del motor real del Node. Los enteros se escriben sin decimales, como `JSON.stringify`, y una prueba lo comprueba. Además se comparó una vez con el Node sobre dos bases gemelas: 144 casos clasificados por cada lado, 48 con apoyo de antecedentes, sin ninguna diferencia.
+44. Diferencias menores con el Node: el resumen del ciclo no lleva `degradadas` (sin modelo siempre es cero) y los registros conservan el texto del Node con los campos en `snake_case`.
 
 ## Fases
 
@@ -52,8 +61,8 @@ Migración de `minsa-incidencias-backend` (Node, Express 5) a esta base FastAPI 
 | 3 | `acceso` y `usuarios`, y `GET /areas` | Hecha (PR #4) |
 | 4 | `incidencias`, lectura y evidencias | Hecha (PR #5) |
 | 5 | `incidencias`, las siete acciones | Hecha (PR #6) |
-| 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Hecha en su rama |
-| 7 | Archivador y clasificador | Pendiente |
+| 6 | `derivaciones`, `consulta_ipress`, `indicadores`, `analisis` y `filtro_corrupcion` | Hecha (PR #7) |
+| 7 | Archivador y clasificador | Hecha en su rama |
 | 8 | Eventos en tiempo real (SSE con LISTEN/NOTIFY) | Pendiente |
 | 9 | Cierre: auditoría contra `v1.json`, documentación, variables para Infraestructura | Pendiente |
 

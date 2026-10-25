@@ -90,7 +90,7 @@ markers = ["integration: pruebas contra una base PostgreSQL real"]
 [tool.coverage.run]
 source = ["app"]
 branch = true
-omit = ["src/app/main.py", "src/app/__main__.py", "src/app/**/ports.py", "src/app/**/adapters/persistence/*"]
+omit = ["src/app/main.py", "src/app/__main__.py", "src/app/clasificador_externo.py","src/app/**/ports.py", "src/app/**/adapters/persistence/*"]
 
 [tool.coverage.report]
 show_missing = true
@@ -104,7 +104,7 @@ include_external_packages = true
 [[tool.importlinter.contracts]]
 name = "El dominio no depende de frameworks ni de drivers"
 type = "forbidden"
-source_modules = ["app.catalogos.domain", "app.acceso.domain", "app.usuarios.domain", "app.incidencias.domain", "app.filtro_corrupcion.domain"]
+source_modules = ["app.catalogos.domain", "app.acceso.domain", "app.usuarios.domain", "app.incidencias.domain", "app.filtro_corrupcion.domain", "app.archivador.domain"]
 forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
@@ -133,33 +133,38 @@ type = "layers"
 layers = ["app.filtro_corrupcion.adapters", "app.filtro_corrupcion.application", "app.filtro_corrupcion.domain"]
 
 [[tool.importlinter.contracts]]
+name = "Las capas apuntan hacia adentro en archivador"
+type = "layers"
+layers = ["app.archivador.adapters", "app.archivador.application", "app.archivador.domain"]
+
+[[tool.importlinter.contracts]]
 name = "Los contextos son independientes entre sí"
 type = "independence"
-modules = ["app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion"]
+modules = ["app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion", "app.archivador"]
 
 [[tool.importlinter.contracts]]
 name = "La aplicación no depende de frameworks ni de drivers"
 type = "forbidden"
-source_modules = ["app.catalogos.application", "app.acceso.application", "app.usuarios.application", "app.incidencias.application", "app.filtro_corrupcion.application"]
+source_modules = ["app.catalogos.application", "app.acceso.application", "app.usuarios.application", "app.incidencias.application", "app.filtro_corrupcion.application", "app.archivador.application"]
 forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
 name = "El kernel compartido no importa contextos ni salud ni configuración"
 type = "forbidden"
 source_modules = ["app.shared"]
-forbidden_modules = ["app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion", "app.health", "app.config"]
+forbidden_modules = ["app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion", "app.archivador", "app.health", "app.config"]
 
 [[tool.importlinter.contracts]]
 name = "Las carpetas puras no dependen de capas ni de frameworks"
 type = "forbidden"
 source_modules = ["app.constants", "app.enums", "app.errors"]
-forbidden_modules = ["app.shared", "app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion", "app.health", "app.config", "app.composition", "fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
+forbidden_modules = ["app.shared", "app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion", "app.archivador", "app.health", "app.config", "app.composition", "fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
 name = "La salud no importa contextos"
 type = "forbidden"
 source_modules = ["app.health"]
-forbidden_modules = ["app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion"]
+forbidden_modules = ["app.catalogos", "app.acceso", "app.usuarios", "app.incidencias", "app.filtro_corrupcion", "app.archivador"]
 
 [tool.poe.tasks]
 typecheck = "mypy"

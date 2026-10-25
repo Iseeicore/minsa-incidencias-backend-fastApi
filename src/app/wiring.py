@@ -5,15 +5,22 @@ from app.acceso.adapters.persistence.usuarios import SqlUsuarioFinder
 from app.acceso.application.cerrar_sesion import CerrarSesion
 from app.acceso.application.iniciar_sesion import IniciarSesion
 from app.acceso.application.resolver_sesion import ResolverSesion
+from app.archivador.adapters.persistence.archivado import SqlArchivadoRepositorio
+from app.archivador.application.archivar_incidencias import ArchivarIncidencias
 from app.catalogos.adapters.persistence.areas import SqlAreaFinder
 from app.catalogos.adapters.persistence.repository import SqlPlazoRepository
 from app.catalogos.application.listar_areas import ListarAreas
 from app.catalogos.application.listar_plazos import ListarPlazos
 from app.composition import Container
+from app.constants.clasificacion import INTERVALO_SONDEO_SEGUNDOS
 from app.constants.limits import MS_PER_SECOND
 from app.constants.sesion import SECONDS_PER_HOUR
+from app.enums.clasificador_modo import ClasificadorModo
 from app.enums.node_env import NodeEnv
+from app.filtro_corrupcion.adapters.persistence.clasificador import SqlAlarmaReader, SqlClasificadorUnitOfWork
+from app.filtro_corrupcion.application.clasificar_incidencias import ClasificadorIncidencias
 from app.filtro_corrupcion.application.evaluar_corrupcion import EvaluarCorrupcion
+from app.filtro_corrupcion.application.trabajador_clasificador import TrabajadorClasificador
 from app.incidencias.adapters.persistence.analisis import SqlAnalisisReader
 from app.incidencias.adapters.persistence.derivaciones import SqlDerivacionReader
 from app.incidencias.adapters.persistence.escritura import SqlIncidenciaUnitOfWork
@@ -42,6 +49,7 @@ from app.incidencias.application.listar_incidencias import ListarIncidencias
 from app.incidencias.application.listar_ipress import ListarIpress
 from app.incidencias.application.obtener_indicadores import ObtenerIndicadores
 from app.incidencias.domain.plazo import PlazosConfigurados
+from app.shared.ciclo_periodico import CicloPeriodico, ProcesosDeFondo
 from app.shared.clock import SystemClock
 from app.shared.database import SqlDatabaseProbe
 from app.shared.http_security import HttpSecurity
@@ -59,6 +67,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncEngine
 
     from app.config.settings import Settings
+    from app.shared.ports import RegistroDeProcesos
     from app.shared.token_bucket import TokenBucketLimiter
 
 
@@ -82,6 +91,25 @@ def build_security(settings: Settings) -> HttpSecurity:
         allowed_origins=tuple(settings.cors_origins),
         trust_proxy=settings.trust_proxy,
     )
+
+
+def build_trabajador_clasificador(engine: AsyncEngine, registro: RegistroDeProcesos) -> TrabajadorClasificador:
+    clasificador = ClasificadorIncidencias(SqlClasificadorUnitOfWork(engine))
+    return TrabajadorClasificador(clasificador, SqlAlarmaReader(engine), registro)
+
+
+def build_procesos(settings: Settings, engine: AsyncEngine, registro: RegistroDeProcesos) -> ProcesosDeFondo:
+    archivador = ArchivarIncidencias(
+        SqlArchivadoRepositorio(engine),
+        registro,
+        vigencia_dias=settings.vigencia_resolucion_dias,
+        lote=settings.archivado_lote,
+    )
+    ciclos = [CicloPeriodico(archivador.ejecutar_con_registro, settings.archivado_interval_seconds)]
+    if settings.clasificador_modo == ClasificadorModo.SONDEO:
+        trabajador = build_trabajador_clasificador(engine, registro)
+        ciclos.append(CicloPeriodico(trabajador.ejecutar_ciclo, INTERVALO_SONDEO_SEGUNDOS))
+    return ProcesosDeFondo(ciclos)
 
 
 def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucketLimiter) -> Container:

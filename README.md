@@ -54,7 +54,16 @@ Detrás de un balanceador, `TRUST_PROXY=true` activa la lectura de `X-Forwarded-
 
 Límites de entrada: cuerpo de hasta 100 KiB, título de hasta 120 caracteres y contenido de hasta 10 000.
 
-Hoy el código consume `NODE_ENV`, `PORT`, `LOG_LEVEL`, `DATABASE_URL`, `CORS_ORIGINS`, `TRUST_PROXY` y las cuatro `DB_*`. El resto se lee y se valida, pero todavía no tiene consumidor: se conectan al migrar sesiones, limitador, archivado y clasificador.
+## Procesos de fondo
+
+El archivador corre dentro del servidor: archiva de inmediato y luego cada `ARCHIVADO_INTERVAL_SECONDS`, `ARCHIVADO_LOTE` casos por vez y con `VIGENCIA_RESOLUCION_DIAS` para lo resuelto. Toma un candado de PostgreSQL en cada pasada, así que si hay más de una instancia solo una archiva a la vez.
+
+El clasificador toma de la cola los casos registrados sin categoría de la IA, del más antiguo al más nuevo, y escribe en una sola transacción el análisis y la categoría. Un caso que falla tres veces se deja fuera hasta reiniciar. Hay dos formas de correrlo:
+
+- `CLASIFICADOR_MODO=sondeo`: dentro del servidor, cada 5 segundos.
+- `CLASIFICADOR_MODO=externo` (por defecto): el servidor no lo ejecuta. Se corre aparte con `python -m app clasificador`, o con `python -m app clasificador --una-vez` para una sola pasada. Se recomienda un solo proceso clasificador por base.
+
+Los dos cierran ordenadamente: esperan al ciclo en curso antes de soltar la conexión.
 
 ## Pruebas contra la base y hooks
 

@@ -12,15 +12,15 @@ from app.incidencias.domain.analisis import (
     ModeloDelAnalisis,
     RequisitoFaltante,
 )
-from app.incidencias.domain.normas import fragmentos_por_id
 from app.incidencias.domain.tiempo import a_iso
+from app.shared.normas import fragmentos_por_id
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
     from app.incidencias.application.leer_senales_guardadas import SenalesGuardadas
     from app.incidencias.domain.analisis import CitaGuardada, FilaAnalisis
-    from app.incidencias.domain.normas import FragmentoNorma
+    from app.shared.normas import FragmentoNorma
 
 
 def _cita_de_norma(cita: CitaGuardada, fragmentos: Mapping[str, FragmentoNorma]) -> CitaDeNorma:

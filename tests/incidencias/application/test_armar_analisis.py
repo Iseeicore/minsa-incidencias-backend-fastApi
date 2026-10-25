@@ -4,7 +4,7 @@ from app.enums.motivo_de_escritura import MotivoDeEscritura
 from app.enums.tipo_contacto import TipoContacto
 from app.enums.variante_ia import VarianteIa
 from app.incidencias.application.armar_analisis import armar_analisis
-from app.incidencias.domain.normas import FragmentoNorma
+from app.shared.normas import FragmentoNorma
 from tests.helpers.analisis_en_memoria import una_fila_de_analisis
 
 CODIGO = "MINSA-2026-000001"
