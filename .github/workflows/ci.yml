@@ -15,11 +15,11 @@ concurrency:
 
 jobs:
   verificar:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 20
     container: python:3.14.7-slim-bookworm
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: pip install --no-cache-dir uv==0.13.5
       - run: uv sync --locked
       - run: uv run poe verificar
