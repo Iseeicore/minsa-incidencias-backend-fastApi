@@ -9,8 +9,10 @@ from app.constants.incidencias import (
     PREFIJO_CODIGO_INCIDENCIA,
     SECUENCIA_DEL_CODIGO_DIGITOS_MINIMOS,
 )
+from app.constants.textos.consulta_ipress import MENSAJE_ESTABLECIMIENTO_NO_DISPONIBLE
 from app.constants.textos.incidencias import MENSAJE_EVIDENCIA_NO_ENCONTRADA
 from app.errors.no_encontrado import NoEncontrado
+from app.shared.codigo_renipress import codigo_renipress_canonico
 
 
 def _son_digitos(texto: str) -> bool:
@@ -40,3 +42,10 @@ def identificador_de_evidencia(evidencia_id: Annotated[str, Path(alias="evidenci
     if canonico != evidencia_id:
         raise NoEncontrado(MENSAJE_EVIDENCIA_NO_ENCONTRADA)
     return evidencia_id
+
+
+def renipress_de_ruta(renipress: str) -> str:
+    canonico = codigo_renipress_canonico(renipress)
+    if canonico is None:
+        raise NoEncontrado(MENSAJE_ESTABLECIMIENTO_NO_DISPONIBLE)
+    return canonico

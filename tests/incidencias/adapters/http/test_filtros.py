@@ -32,7 +32,7 @@ def _listado(**cambios: object) -> object:
         "limite": 20,
         "cursor": None,
     }
-    return consulta_de_listado(**{**parametros, **cambios})  # type: ignore[arg-type]
+    return consulta_de_listado(**{**parametros, **cambios})
 
 
 def _errores(**cambios: object) -> list[dict[str, str]]:

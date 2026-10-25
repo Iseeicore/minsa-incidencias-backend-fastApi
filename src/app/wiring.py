@@ -15,7 +15,17 @@ from app.constants.sesion import SECONDS_PER_HOUR
 from app.enums.node_env import NodeEnv
 from app.incidencias.adapters.persistence.derivaciones import SqlDerivacionReader
 from app.incidencias.adapters.persistence.escritura import SqlIncidenciaUnitOfWork
+from app.incidencias.adapters.persistence.indicadores import SqlIndicadoresReader
+from app.incidencias.adapters.persistence.ipress import SqlIpressFinder
 from app.incidencias.adapters.persistence.repository import SqlIncidenciaReader
+from app.incidencias.application.consulta_de_ipress import (
+    ConsultarIncidenciaDeIpress,
+    ContarIncidenciasDeIpress,
+    ContenidoDeEvidenciaDeIpress,
+    ListarIncidenciasDeIpress,
+    ObtenerIndicadoresDeIpress,
+    ObtenerResumenDeIpress,
+)
 from app.incidencias.application.consultar_derivacion import ConsultarDerivacion
 from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
 from app.incidencias.application.contar_derivaciones import ContarDerivaciones
@@ -26,6 +36,8 @@ from app.incidencias.application.ejecutar_accion import EjecutarAccion
 from app.incidencias.application.incidencias_por_vencer import IncidenciasPorVencer
 from app.incidencias.application.listar_derivaciones import ListarDerivaciones
 from app.incidencias.application.listar_incidencias import ListarIncidencias
+from app.incidencias.application.listar_ipress import ListarIpress
+from app.incidencias.application.obtener_indicadores import ObtenerIndicadores
 from app.incidencias.domain.plazo import PlazosConfigurados
 from app.shared.clock import SystemClock
 from app.shared.database import SqlDatabaseProbe
@@ -76,8 +88,13 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
     incidencias = SqlIncidenciaReader(engine)
     derivaciones = SqlDerivacionReader(engine)
     plazos = PlazosConfigurados(settings.vigencia_resolucion_dias, settings.plazo_aviso_horas)
+    ipress = SqlIpressFinder(engine)
     consultar_incidencia = ConsultarIncidencia(incidencias, plazos)
     contenido_de_evidencia = ContenidoDeEvidencia(incidencias)
+    listar_incidencias = ListarIncidencias(incidencias, plazos)
+    contar_incidencias = ContarIncidencias(incidencias, plazos)
+    indicadores = SqlIndicadoresReader(engine)
+    obtener_indicadores = ObtenerIndicadores(indicadores, plazos)
     return Container(
         listar_plazos=ListarPlazos(SqlPlazoRepository(engine)),
         listar_areas=ListarAreas(SqlAreaFinder(engine)),
@@ -87,8 +104,8 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         crear_usuario=CrearUsuario(usuarios_uow, hasher),
         actualizar_usuario=ActualizarUsuario(usuarios_uow),
         restablecer_clave=RestablecerClave(usuarios_uow, hasher),
-        listar_incidencias=ListarIncidencias(incidencias, plazos),
-        contar_incidencias=ContarIncidencias(incidencias, plazos),
+        listar_incidencias=listar_incidencias,
+        contar_incidencias=contar_incidencias,
         incidencias_por_vencer=IncidenciasPorVencer(incidencias, plazos),
         consultar_incidencia=consultar_incidencia,
         contenido_de_evidencia=contenido_de_evidencia,
@@ -97,6 +114,14 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         contar_derivaciones=ContarDerivaciones(derivaciones),
         consultar_derivacion=ConsultarDerivacion(derivaciones, consultar_incidencia),
         contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
+        obtener_indicadores=obtener_indicadores,
+        listar_ipress=ListarIpress(ipress),
+        resumen_de_ipress=ObtenerResumenDeIpress(ipress, indicadores),
+        indicadores_de_ipress=ObtenerIndicadoresDeIpress(ipress, obtener_indicadores),
+        listar_incidencias_de_ipress=ListarIncidenciasDeIpress(ipress, listar_incidencias),
+        contar_incidencias_de_ipress=ContarIncidenciasDeIpress(ipress, contar_incidencias),
+        consultar_incidencia_de_ipress=ConsultarIncidenciaDeIpress(ipress, consultar_incidencia),
+        contenido_de_evidencia_de_ipress=ContenidoDeEvidenciaDeIpress(ipress, contenido_de_evidencia),
         database_probe=SqlDatabaseProbe(engine, timeout_seconds=settings.db_connection_timeout_ms / MS_PER_SECOND),
         clock=SystemClock(),
         session_resolver=ResolverSesion(sesiones, settings.session_idle_minutes),

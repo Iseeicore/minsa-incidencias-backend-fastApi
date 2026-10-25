@@ -10,6 +10,7 @@ if TYPE_CHECKING:
     from app.enums.tipo_area import TipoArea
     from app.incidencias.domain.caso_consultado import CasoConsultado, ConteoPorVencer, EvidenciaConsultada
     from app.incidencias.domain.consultas import FiltrosCasos, Visibilidad, VisibilidadOperativa
+    from app.incidencias.domain.cubos_de_evolucion import DiaDeEvolucion
     from app.incidencias.domain.cursores import PosicionDeListado, PosicionPorVencer
     from app.incidencias.domain.derivaciones import (
         ConsultaDeDerivaciones,
@@ -18,6 +19,8 @@ if TYPE_CHECKING:
         FiltrosDeDerivaciones,
     )
     from app.incidencias.domain.fila_historial import FilaHistorial
+    from app.incidencias.domain.indicadores import FilaDistribucion, FilaResumen
+    from app.incidencias.domain.ipress import ConsultaDeIpress, IpressConsultada, IpressListada
     from app.shared.permisos import ReglaDeAccion
 
 
@@ -71,6 +74,20 @@ class DerivacionReader(Protocol):
     async def contar(self, filtros: FiltrosDeDerivaciones) -> ConteosDeDerivaciones: ...
 
     async def buscar_por_codigo(self, codigo: str) -> DerivacionConsultada | None: ...
+
+
+class IndicadoresReader(Protocol):
+    async def resumen(self, visible: Visibilidad, dias: int, aviso_horas: int) -> FilaResumen: ...
+
+    async def distribucion(self, visible: Visibilidad) -> list[FilaDistribucion]: ...
+
+    async def evolucion_diaria(self, visible: Visibilidad, dias: int) -> list[DiaDeEvolucion]: ...
+
+
+class IpressFinder(Protocol):
+    async def buscar(self, renipress: str) -> IpressConsultada | None: ...
+
+    async def listar(self, consulta: ConsultaDeIpress, limite: int) -> list[IpressListada]: ...
 
 
 class IncidenciaTransaction(Protocol):

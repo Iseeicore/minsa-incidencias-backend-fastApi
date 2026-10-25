@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from app.constants.indicadores import TARJETAS_DEL_TABLERO, TARJETAS_EN_ORDEN
 from app.enums.accion_incidencia import AccionIncidencia
 from app.enums.alcance_de_usuarios import AlcanceDeUsuarios
 from app.enums.categoria_incidencia import CategoriaIncidencia
@@ -10,6 +11,8 @@ from app.enums.vista_codigo import VistaCodigo
 
 if TYPE_CHECKING:
     from collections.abc import Iterable, Mapping
+
+    from app.enums.tarjeta_codigo import TarjetaCodigo
 
 
 @dataclass(frozen=True, slots=True)
@@ -36,6 +39,7 @@ class PermisosDelRol:
     avisa_todo_lo_abierto: bool
     cuenta_todas_las_areas: bool
     acciones: tuple[ReglaDeAccion, ...] = ()
+    tarjetas: tuple[TarjetaCodigo, ...] = TARJETAS_DEL_TABLERO
 
 
 TODAS_LAS_VISTAS = tuple(VistaCodigo)
@@ -157,3 +161,12 @@ def gestion_de_usuarios(roles: Iterable[str]) -> GestionDeUsuarios | None:
             alcance = gestion.alcance
         asignables.update(dict.fromkeys(gestion.roles_asignables))
     return None if alcance is None else GestionDeUsuarios(alcance, tuple(asignables))
+
+
+def tarjetas_de_roles(roles: Iterable[str]) -> tuple[TarjetaCodigo, ...]:
+    habilitadas = {tarjeta for permisos in _permisos_de(roles) for tarjeta in permisos.tarjetas}
+    return tuple(tarjeta for tarjeta in TARJETAS_EN_ORDEN if tarjeta in habilitadas)
+
+
+def cuenta_todas_las_areas(roles: Iterable[str]) -> bool:
+    return any(permisos.cuenta_todas_las_areas for permisos in _permisos_de(roles))

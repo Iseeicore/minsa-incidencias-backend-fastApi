@@ -1,4 +1,3 @@
-from dataclasses import replace
 from typing import TYPE_CHECKING
 
 from app.constants.textos.derivaciones import MENSAJE_DERIVACION_NO_DISPONIBLE
@@ -23,4 +22,4 @@ class ConsultarDerivacion:
         if fila is None:
             raise NoEncontrado(MENSAJE_DERIVACION_NO_DISPONIBLE)
         caso = await self._casos.execute(sesion, codigo, VISIBILIDAD_DE_DERIVACIONES)
-        return DerivacionDetalle(resumir_derivacion(fila), replace(caso, resumen=replace(caso.resumen, acciones=())))
+        return DerivacionDetalle(resumir_derivacion(fila), caso)

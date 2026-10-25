@@ -24,4 +24,4 @@ class ConsultarIncidencia:
         if fila is None:
             raise NoEncontrado(MENSAJE_CASO_NO_ENCONTRADO)
         evidencias, historial = await asyncio.gather(self._casos.evidencias(fila.id), self._casos.historial(fila.id))
-        return detallar(fila, sesion, self._plazos, evidencias, historial)
+        return detallar(fila, sesion if visible is None else None, self._plazos, evidencias, historial)

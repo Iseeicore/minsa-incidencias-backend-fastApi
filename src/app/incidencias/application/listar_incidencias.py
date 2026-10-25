@@ -37,6 +37,7 @@ class ListarIncidencias:
         self, sesion: SesionActual, consulta: ConsultaListado, visibilidad: Visibilidad | None = None
     ) -> Pagina[CasoResumen]:
         visible = visibilidad_o_de(sesion, visibilidad)
+        quien_ve = sesion if visibilidad is None else None
         filtros = filtros_de(consulta.filtros, self._plazos)
         pedidos = limite_con_extra(consulta.limite)
         if filtros.aviso_horas is not None:
@@ -47,5 +48,5 @@ class ListarIncidencias:
         else:
             filas = await self._casos.listar(visible, filtros, pedidos, consulta.despues_de)
             pagina = pagina_de(filas, consulta.limite, _cursor_de_listado)
-        items = [resumir(fila, sesion, self._plazos) for fila in pagina.items]
+        items = [resumir(fila, quien_ve, self._plazos) for fila in pagina.items]
         return Pagina(items, pagina.siguiente, pagina.hay_mas)

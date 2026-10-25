@@ -52,3 +52,34 @@ DERIVACION_EJEMPLO = {
     "estado": "derivado",
     "motivoArchivo": None,
 }
+INDICADORES_EJEMPLO = {
+    "periodo": "7d",
+    "generadoEn": "2026-10-24T12:00:00.000Z",
+    "alcance": {
+        "tipo": "AREA",
+        "area": {"codigo": "EESS-0001", "nombre": "Centro de Salud Ejemplo", "tipo": "ESTABLECIMIENTO"},
+    },
+    "tarjetas": [
+        {"codigo": "recibidos", "valor": 12, "anterior": 9},
+        {"codigo": "pendientes", "valor": 4, "anterior": None},
+    ],
+    "porCategoria": [{"categoria": "reclamo", "cantidad": 7}],
+    "porEstado": [{"estado": "registrado", "cantidad": 4}],
+    "evolucion": [{"desde": "2026-01-09", "recibidos": 2, "resueltos": 1}],
+    "tiempoPromedioHoras": 18.5,
+}
+RESUMEN_DE_IPRESS_EJEMPLO = {
+    "total": 5,
+    "abiertos": 2,
+    "enGestion": 1,
+    "resueltos": 2,
+    "archivados": 1,
+    "porCategoria": [{"categoria": "reclamo", "cantidad": 4}],
+}
+IPRESS_EJEMPLO = {
+    "id": 3,
+    "codigo": "EESS-0001",
+    "nombre": "Centro de Salud Ejemplo",
+    "tipoArea": "ESTABLECIMIENTO",
+    "establecimiento": {"codigoRenipress": "1", "nivelAtencion": "I", "categoria": "I-3"},
+}

@@ -2,8 +2,15 @@ import pytest
 
 from app.enums.alcance_de_usuarios import AlcanceDeUsuarios
 from app.enums.rol_codigo import RolCodigo
+from app.enums.tarjeta_codigo import TarjetaCodigo
 from app.enums.vista_codigo import VistaCodigo
-from app.shared.permisos import gestion_de_usuarios, ve_todas_las_areas, vistas_de_roles
+from app.shared.permisos import (
+    cuenta_todas_las_areas,
+    gestion_de_usuarios,
+    tarjetas_de_roles,
+    ve_todas_las_areas,
+    vistas_de_roles,
+)
 
 TODAS = tuple(VistaCodigo)
 
@@ -77,3 +84,26 @@ def test_combinar_roles_gana_el_alcance_total(roles: list[str]) -> None:
 @pytest.mark.parametrize("roles", [[], ["GESTOR"], ["OTRANS"], ["NO_EXISTE"]])
 def test_sin_rol_que_gestione_usuarios_no_hay_gestion(roles: list[str]) -> None:
     assert gestion_de_usuarios(roles) is None
+
+
+@pytest.mark.parametrize("rol", ["ADMINISTRADOR", "GESTOR", "OTRANS", "ESTABLECIMIENTO"])
+def test_cada_rol_vigente_tiene_las_cuatro_tarjetas_del_tablero(rol: str) -> None:
+    assert tarjetas_de_roles([rol]) == (
+        TarjetaCodigo.RECIBIDOS,
+        TarjetaCodigo.PENDIENTES,
+        TarjetaCodigo.EN_GESTION,
+        TarjetaCodigo.RESUELTOS,
+    )
+
+
+def test_varios_roles_no_repiten_tarjetas_y_un_rol_desconocido_no_suma() -> None:
+    assert len(tarjetas_de_roles(["GESTOR", "OTRANS"])) == 4
+    assert tarjetas_de_roles(["DIRIS", "NO_EXISTE"]) == ()
+
+
+@pytest.mark.parametrize(
+    ("roles", "esperado"),
+    [(["ADMINISTRADOR"], True), (["GESTOR"], False), (["OTRANS", "ADMINISTRADOR"], True), (["NO_EXISTE"], False)],
+)
+def test_quien_cuenta_todas_las_areas(roles: list[str], esperado: bool) -> None:  # noqa: FBT001
+    assert cuenta_todas_las_areas(roles) is esperado
