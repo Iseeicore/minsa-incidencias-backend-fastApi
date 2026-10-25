@@ -15,6 +15,7 @@ from app.incidencias.application.consulta_de_ipress import (
     ObtenerIndicadoresDeIpress,
     ObtenerResumenDeIpress,
 )
+from app.incidencias.application.consultar_analisis import ConsultarAnalisis
 from app.incidencias.application.consultar_derivacion import ConsultarDerivacion
 from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
 from app.incidencias.application.contar_derivaciones import ContarDerivaciones
@@ -42,6 +43,7 @@ from tests.helpers.acceso_en_memoria import (
     SesionesDeAccesoEnMemoria,
     UsuariosDeAccesoEnMemoria,
 )
+from tests.helpers.analisis_en_memoria import AnalisisEnMemoria
 from tests.helpers.builders import los_plazos_del_catalogo, una_seguridad, una_sesion
 from tests.helpers.derivaciones_en_memoria import DerivacionesEnMemoria
 from tests.helpers.fakes import (
@@ -73,6 +75,7 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
     derivaciones: DerivacionesEnMemoria | None = None,
     indicadores: IndicadoresEnMemoria | None = None,
     ipress: IpressEnMemoria | None = None,
+    analisis: AnalisisEnMemoria | None = None,
 ) -> Container:
     plazos = repositorio or InMemoryPlazoRepository(los_plazos_del_catalogo())
     almacen = usuarios or UsuariosEnMemoria()
@@ -107,6 +110,7 @@ def un_contenedor(  # noqa: PLR0913, PLR0917
         contar_derivaciones=ContarDerivaciones(envios),
         consultar_derivacion=ConsultarDerivacion(envios, consultar_incidencia),
         contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
+        consultar_analisis=ConsultarAnalisis(casos, analisis or AnalisisEnMemoria()),
         obtener_indicadores=obtener_indicadores,
         listar_ipress=ListarIpress(buscador_de_ipress),
         resumen_de_ipress=ObtenerResumenDeIpress(buscador_de_ipress, lector_de_indicadores),

@@ -1,0 +1,10 @@
+from enum import StrEnum
+
+
+class MotivoDeEscritura(StrEnum):
+    REGLAS = "REGLAS"
+    IDENTIDAD = "IDENTIDAD"
+    SUMA_CON_MODELO = "SUMA_CON_MODELO"
+    DUDA_DEL_MODELO = "DUDA_DEL_MODELO"
+    DUDA_SIN_MODELO = "DUDA_SIN_MODELO"
+    SIN_CORRUPCION = "SIN_CORRUPCION"

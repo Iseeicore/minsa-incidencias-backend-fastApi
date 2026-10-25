@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from app.enums.motivo_archivo import MotivoArchivo
     from app.enums.resultado_resolucion import ResultadoResolucion
     from app.enums.tipo_area import TipoArea
+    from app.incidencias.domain.analisis import FilaAnalisis
     from app.incidencias.domain.caso_consultado import CasoConsultado, ConteoPorVencer, EvidenciaConsultada
     from app.incidencias.domain.consultas import FiltrosCasos, Visibilidad, VisibilidadOperativa
     from app.incidencias.domain.cubos_de_evolucion import DiaDeEvolucion
@@ -74,6 +75,10 @@ class DerivacionReader(Protocol):
     async def contar(self, filtros: FiltrosDeDerivaciones) -> ConteosDeDerivaciones: ...
 
     async def buscar_por_codigo(self, codigo: str) -> DerivacionConsultada | None: ...
+
+
+class AnalisisReader(Protocol):
+    async def buscar(self, incidencia_id: str) -> FilaAnalisis | None: ...
 
 
 class IndicadoresReader(Protocol):

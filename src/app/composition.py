@@ -20,6 +20,7 @@ from app.constants.limits import CORS_MAX_AGE_SECONDS, JSON_BODY_LIMIT_BYTES
 from app.health.router import build_health_router
 from app.incidencias.adapters.http.router import build_incidencias_router
 from app.incidencias.adapters.http.router_de_acciones import build_acciones_router
+from app.incidencias.adapters.http.router_de_analisis import build_analisis_router
 from app.incidencias.adapters.http.router_de_derivaciones import build_derivaciones_router
 from app.incidencias.adapters.http.router_de_indicadores import build_indicadores_router
 from app.incidencias.adapters.http.router_de_ipress import build_ipress_router
@@ -48,6 +49,7 @@ if TYPE_CHECKING:
         ObtenerIndicadoresDeIpress,
         ObtenerResumenDeIpress,
     )
+    from app.incidencias.application.consultar_analisis import ConsultarAnalisis
     from app.incidencias.application.consultar_derivacion import ConsultarDerivacion
     from app.incidencias.application.consultar_incidencia import ConsultarIncidencia
     from app.incidencias.application.contar_derivaciones import ContarDerivaciones
@@ -96,6 +98,7 @@ class Container:
     contar_derivaciones: ContarDerivaciones
     consultar_derivacion: ConsultarDerivacion
     contenido_de_evidencia_derivada: ContenidoDeEvidenciaDerivada
+    consultar_analisis: ConsultarAnalisis
     obtener_indicadores: ObtenerIndicadores
     listar_ipress: ListarIpress
     resumen_de_ipress: ObtenerResumenDeIpress
@@ -175,6 +178,7 @@ def create_v1_app(container: Container, *, docs_enabled: bool = False) -> FastAP
             container.contenido_de_evidencia_derivada,
         )
     )
+    app.include_router(build_analisis_router(container.consultar_analisis))
     app.include_router(build_indicadores_router(container.obtener_indicadores))
     app.include_router(
         build_ipress_router(
