@@ -17,6 +17,7 @@ from app.constants.http import (
     REDOC_PATH,
 )
 from app.constants.limits import CORS_MAX_AGE_SECONDS, JSON_BODY_LIMIT_BYTES
+from app.eventos.adapters.http.router import build_eventos_router
 from app.filtro_corrupcion.adapters.http.router import build_filtro_corrupcion_router
 from app.health.router import build_health_router
 from app.incidencias.adapters.http.router import build_incidencias_router
@@ -42,6 +43,7 @@ if TYPE_CHECKING:
     from app.acceso.application.iniciar_sesion import IniciarSesion
     from app.catalogos.application.listar_areas import ListarAreas
     from app.catalogos.application.listar_plazos import ListarPlazos
+    from app.eventos.application.suscribirse_a_eventos import SuscribirseAEventos
     from app.filtro_corrupcion.application.evaluar_corrupcion import EvaluarCorrupcion
     from app.incidencias.application.consulta_de_ipress import (
         ConsultarIncidenciaDeIpress,
@@ -102,6 +104,7 @@ class Container:
     contenido_de_evidencia_derivada: ContenidoDeEvidenciaDerivada
     consultar_analisis: ConsultarAnalisis
     evaluar_corrupcion: EvaluarCorrupcion
+    suscribirse_a_eventos: SuscribirseAEventos
     obtener_indicadores: ObtenerIndicadores
     listar_ipress: ListarIpress
     resumen_de_ipress: ObtenerResumenDeIpress
@@ -183,6 +186,7 @@ def create_v1_app(container: Container, *, docs_enabled: bool = False) -> FastAP
     )
     app.include_router(build_analisis_router(container.consultar_analisis))
     app.include_router(build_filtro_corrupcion_router(container.evaluar_corrupcion))
+    app.include_router(build_eventos_router(container.suscribirse_a_eventos))
     app.include_router(build_indicadores_router(container.obtener_indicadores))
     app.include_router(
         build_ipress_router(

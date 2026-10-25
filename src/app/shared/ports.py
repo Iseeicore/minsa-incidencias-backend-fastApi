@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
-    from app.shared.sesion import SesionActual
+    from app.shared.sesion import SesionActual, SesionEnVivo
 
 
 class DatabaseProbe(Protocol):
@@ -24,3 +24,23 @@ class RegistroDeProcesos(Protocol):
     def warning(self, evento: str, **datos: object) -> None: ...
 
     def error(self, evento: str, **datos: object) -> None: ...
+
+
+class ControlDeSesion(Protocol):
+    def identificar(self, usuario_id: str) -> bool: ...
+
+    def vigente(self) -> bool: ...
+
+    def liberar(self) -> None: ...
+
+
+class InvalidadorDeUsuarios(Protocol):
+    def invalidar_usuario(self, usuario_id: str) -> None: ...
+
+
+class SeguimientoDeSesiones(InvalidadorDeUsuarios, Protocol):
+    def iniciar_verificacion(self, sesion_id: str) -> ControlDeSesion: ...
+
+    def actualizar_sesion(self, sesion: SesionEnVivo) -> None: ...
+
+    def invalidar_sesion(self, sesion_id: str) -> None: ...

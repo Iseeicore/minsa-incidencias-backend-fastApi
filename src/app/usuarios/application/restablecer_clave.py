@@ -6,15 +6,18 @@ from app.usuarios.domain.gestion import exigir_gestion, restriccion_de, usuario_
 from app.usuarios.domain.pedidos import UsuarioConClave
 
 if TYPE_CHECKING:
-    from app.shared.ports import PasswordHasher
+    from app.shared.ports import InvalidadorDeUsuarios, PasswordHasher
     from app.shared.sesion import SesionActual
     from app.usuarios.application.ports import UsuarioUnitOfWork
 
 
 class RestablecerClave:
-    def __init__(self, unidad: UsuarioUnitOfWork, hasher: PasswordHasher) -> None:
+    def __init__(
+        self, unidad: UsuarioUnitOfWork, hasher: PasswordHasher, seguimiento: InvalidadorDeUsuarios | None = None
+    ) -> None:
         self._unidad = unidad
         self._hasher = hasher
+        self._seguimiento = seguimiento
 
     async def execute(self, sesion: SesionActual, usuario_id: str) -> UsuarioConClave:
         gestion = exigir_gestion(sesion.roles)
@@ -26,4 +29,6 @@ class RestablecerClave:
                 raise usuario_no_encontrado()
             await tx.cambiar_clave(usuario_id, huella)
             await tx.cerrar_sesiones(usuario_id)
+        if self._seguimiento is not None:
+            self._seguimiento.invalidar_usuario(usuario_id)
         return UsuarioConClave(actual, clave_inicial)

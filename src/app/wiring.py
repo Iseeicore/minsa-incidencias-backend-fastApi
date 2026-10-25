@@ -1,4 +1,8 @@
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
+
+import structlog
+from sqlalchemy import make_url
 
 from app.acceso.adapters.persistence.sesiones import SqlSesionStore
 from app.acceso.adapters.persistence.usuarios import SqlUsuarioFinder
@@ -17,6 +21,13 @@ from app.constants.limits import MS_PER_SECOND
 from app.constants.sesion import SECONDS_PER_HOUR
 from app.enums.clasificador_modo import ClasificadorModo
 from app.enums.node_env import NodeEnv
+from app.eventos.adapters.persistence.categorias import SqlCategoriasPorRol
+from app.eventos.adapters.persistence.notificaciones import AbridorDeConexionPostgres, SqlInstaladorDeNotificaciones
+from app.eventos.adapters.tiempo import TiempoAsyncio
+from app.eventos.application.escuchar_cambios import EscucharCambios
+from app.eventos.application.publicar_cambios import PublicarCambios
+from app.eventos.application.suscribirse_a_eventos import SuscribirseAEventos
+from app.eventos.domain.centro_de_eventos import CentroDeEventos
 from app.filtro_corrupcion.adapters.persistence.clasificador import SqlAlarmaReader, SqlClasificadorUnitOfWork
 from app.filtro_corrupcion.application.clasificar_incidencias import ClasificadorIncidencias
 from app.filtro_corrupcion.application.evaluar_corrupcion import EvaluarCorrupcion
@@ -93,6 +104,23 @@ def build_security(settings: Settings) -> HttpSecurity:
     )
 
 
+@dataclass(frozen=True, slots=True)
+class Eventos:
+    centro: CentroDeEventos
+    escuchar: EscucharCambios
+
+
+def build_eventos(settings: Settings, engine: AsyncEngine, registro: RegistroDeProcesos) -> Eventos:
+    tiempo = TiempoAsyncio()
+    centro = CentroDeEventos(tiempo, registro)
+    publicar = PublicarCambios(centro, SqlCategoriasPorRol(engine), tiempo, registro)
+    url = make_url(settings.database_url.get_secret_value()).set(drivername="postgresql")
+    abridor = AbridorDeConexionPostgres(
+        url.render_as_string(hide_password=False), max(1, settings.db_connection_timeout_ms // MS_PER_SECOND)
+    )
+    return Eventos(centro, EscucharCambios(SqlInstaladorDeNotificaciones(engine), abridor, publicar, registro))
+
+
 def build_trabajador_clasificador(engine: AsyncEngine, registro: RegistroDeProcesos) -> TrabajadorClasificador:
     clasificador = ClasificadorIncidencias(SqlClasificadorUnitOfWork(engine))
     return TrabajadorClasificador(clasificador, SqlAlarmaReader(engine), registro)
@@ -112,9 +140,12 @@ def build_procesos(settings: Settings, engine: AsyncEngine, registro: RegistroDe
     return ProcesosDeFondo(ciclos)
 
 
-def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucketLimiter) -> Container:
+def build_container(
+    settings: Settings, engine: AsyncEngine, limiter: TokenBucketLimiter, centro: CentroDeEventos | None = None
+) -> Container:
     hasher = Argon2PasswordHasher()
     sesiones = SqlSesionStore(engine)
+    seguimiento = centro if centro is not None else CentroDeEventos(TiempoAsyncio(), structlog.get_logger())
     usuarios_uow = SqlUsuarioUnitOfWork(engine)
     incidencias = SqlIncidenciaReader(engine)
     derivaciones = SqlDerivacionReader(engine)
@@ -130,11 +161,11 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         listar_plazos=ListarPlazos(SqlPlazoRepository(engine)),
         listar_areas=ListarAreas(SqlAreaFinder(engine)),
         iniciar_sesion=IniciarSesion(SqlUsuarioFinder(engine), sesiones, hasher, settings.session_absolute_hours),
-        cerrar_sesion=CerrarSesion(sesiones),
+        cerrar_sesion=CerrarSesion(sesiones, seguimiento),
         listar_usuarios=ListarUsuarios(SqlUsuarioReader(engine)),
         crear_usuario=CrearUsuario(usuarios_uow, hasher),
-        actualizar_usuario=ActualizarUsuario(usuarios_uow),
-        restablecer_clave=RestablecerClave(usuarios_uow, hasher),
+        actualizar_usuario=ActualizarUsuario(usuarios_uow, seguimiento),
+        restablecer_clave=RestablecerClave(usuarios_uow, hasher, seguimiento),
         listar_incidencias=listar_incidencias,
         contar_incidencias=contar_incidencias,
         incidencias_por_vencer=IncidenciasPorVencer(incidencias, plazos),
@@ -147,6 +178,7 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         contenido_de_evidencia_derivada=ContenidoDeEvidenciaDerivada(contenido_de_evidencia),
         consultar_analisis=ConsultarAnalisis(incidencias, SqlAnalisisReader(engine)),
         evaluar_corrupcion=EvaluarCorrupcion(),
+        suscribirse_a_eventos=SuscribirseAEventos(seguimiento),
         obtener_indicadores=obtener_indicadores,
         listar_ipress=ListarIpress(ipress),
         resumen_de_ipress=ObtenerResumenDeIpress(ipress, indicadores),
@@ -157,7 +189,7 @@ def build_container(settings: Settings, engine: AsyncEngine, limiter: TokenBucke
         contenido_de_evidencia_de_ipress=ContenidoDeEvidenciaDeIpress(ipress, contenido_de_evidencia),
         database_probe=SqlDatabaseProbe(engine, timeout_seconds=settings.db_connection_timeout_ms / MS_PER_SECOND),
         clock=SystemClock(),
-        session_resolver=ResolverSesion(sesiones, settings.session_idle_minutes),
+        session_resolver=ResolverSesion(sesiones, settings.session_idle_minutes, seguimiento),
         limiter=limiter,
         security=build_security(settings),
     )

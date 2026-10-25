@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 
     from app.enums.tipo_area import TipoArea
     from app.enums.vista_codigo import VistaCodigo
+    from app.shared.ports import ControlDeSesion
 
 
 @dataclass(frozen=True, slots=True)
@@ -32,3 +33,14 @@ class SesionActual:
     area: AreaDeSesion | None = None
     vistas: tuple[VistaCodigo, ...] = ()
     vigencia: VigenciaDeSesion | None = None
+    control_eventos: ControlDeSesion | None = field(default=None, compare=False, repr=False)
+
+
+@dataclass(frozen=True, slots=True)
+class SesionEnVivo:
+    sesion_id: str
+    usuario_id: str
+    roles: tuple[str, ...]
+    area_id: int | None
+    vigencia: VigenciaDeSesion
+    control: ControlDeSesion

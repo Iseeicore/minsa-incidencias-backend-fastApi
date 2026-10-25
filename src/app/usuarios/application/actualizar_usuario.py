@@ -16,6 +16,7 @@ from app.usuarios.domain.gestion import exigir_gestion, exigir_rol_asignable, re
 
 if TYPE_CHECKING:
     from app.shared.permisos import GestionDeUsuarios
+    from app.shared.ports import InvalidadorDeUsuarios
     from app.shared.sesion import SesionActual
     from app.usuarios.application.ports import UsuarioTransaction, UsuarioUnitOfWork
     from app.usuarios.domain.pedidos import CambiosDeUsuario
@@ -24,6 +25,11 @@ if TYPE_CHECKING:
 
 def _cambia_rol(actual: UsuarioGestionado, cambios: CambiosDeUsuario) -> bool:
     return cambios.rol is not None and cambios.rol != actual.rol
+
+
+def _afecta_la_sesion(actual: UsuarioGestionado, cambios: CambiosDeUsuario, area_final: int | None) -> bool:
+    cambia_vigencia = cambios.activo is not None and cambios.activo != actual.activo
+    return _cambia_rol(actual, cambios) or area_final != actual.area_id or cambia_vigencia
 
 
 async def _area_final(
@@ -47,8 +53,9 @@ async def _area_final(
 
 
 class ActualizarUsuario:
-    def __init__(self, unidad: UsuarioUnitOfWork) -> None:
+    def __init__(self, unidad: UsuarioUnitOfWork, seguimiento: InvalidadorDeUsuarios | None = None) -> None:
         self._unidad = unidad
+        self._seguimiento = seguimiento
 
     async def execute(self, sesion: SesionActual, usuario_id: str, cambios: CambiosDeUsuario) -> UsuarioGestionado:
         gestion = exigir_gestion(sesion.roles)
@@ -63,6 +70,8 @@ class ActualizarUsuario:
             recargado = await tx.buscar_por_id(usuario_id, None)
             if recargado is None:
                 raise usuario_no_encontrado()
+        if self._seguimiento is not None and _afecta_la_sesion(actual, cambios, area_final):
+            self._seguimiento.invalidar_usuario(usuario_id)
         return recargado
 
     def _validar(
