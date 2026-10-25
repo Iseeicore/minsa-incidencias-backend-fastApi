@@ -1,0 +1,25 @@
+name: verificar
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: verificar-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container: python:3.14.7-slim-bookworm
+    steps:
+      - uses: actions/checkout@v4
+      - run: pip install --no-cache-dir uv==0.13.5
+      - run: uv sync --locked
+      - run: uv run poe verificar

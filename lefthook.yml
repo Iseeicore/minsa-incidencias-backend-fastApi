@@ -1,0 +1,21 @@
+pre-commit:
+  commands:
+    format:
+      glob: "*.py"
+      run: uv run ruff format --check {staged_files}
+    lint:
+      glob: "*.py"
+      run: uv run ruff check {staged_files}
+    typecheck:
+      glob: "*.py"
+      run: uv run mypy
+    tests:
+      glob: "*.py"
+      run: uv run poe test
+
+pre-push:
+  commands:
+    verificar:
+      run: uv run poe verificar
+    integracion:
+      run: uv run poe test-integration

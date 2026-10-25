@@ -1,0 +1,6 @@
+GENERIC_HTTP_MESSAGE = "Error HTTP"
+INTERNAL_ERROR_MESSAGE = "Ocurrió un error interno"
+REQUEST_INVALID_MESSAGE = "La petición no cumple el contrato"
+ROUTE_NOT_FOUND_MESSAGE = "La ruta no existe"
+METHOD_NOT_ALLOWED_MESSAGE = "El método no está permitido"
+PAYLOAD_TOO_LARGE_MESSAGE = "El cuerpo supera el límite permitido"

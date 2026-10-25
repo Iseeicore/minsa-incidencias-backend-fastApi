@@ -1,0 +1,175 @@
+import json
+from http import HTTPStatus
+
+import pytest
+from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from starlette.types import Message, Receive, Scope, Send
+
+from app.nota.domain.errors.fecha_sin_zona_horaria import FechaSinZonaHoraria
+from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
+from app.shared.logging import configure_logging
+from tests.helpers.app_factory import un_cliente, un_contenedor
+from tests.helpers.fakes import FixedClock, RaisingNotaRepository
+
+
+class SondaQueFalla:
+    async def ping(self) -> bool:
+        message = "secreto interno de la base"
+        raise RuntimeError(message)
+
+
+@pytest.mark.parametrize("ruta", ["/no-existe", "/v1/no-existe"], ids=["raiz", "v1"])
+async def test_una_ruta_inexistente_responde_con_el_formato_unico(ruta: str) -> None:
+    async with un_cliente(un_contenedor()) as cliente:
+        respuesta = await cliente.get(ruta)
+
+    assert respuesta.status_code == HTTPStatus.NOT_FOUND
+    assert respuesta.json() == {
+        "statusCode": 404,
+        "errorCode": "ROUTE_NOT_FOUND",
+        "message": "La ruta no existe",
+        "timestamp": "2026-10-24T12:00:00Z",
+        "path": ruta,
+    }
+
+
+async def test_un_metodo_no_permitido_responde_405_con_el_formato_unico() -> None:
+    async with un_cliente(un_contenedor()) as cliente:
+        respuesta = await cliente.delete("/v1/notas/NOTA-000001")
+
+    assert respuesta.status_code == HTTPStatus.METHOD_NOT_ALLOWED
+    assert respuesta.json()["errorCode"] == "METHOD_NOT_ALLOWED"
+    assert respuesta.json()["path"] == "/v1/notas/NOTA-000001"
+
+
+async def test_un_error_inesperado_responde_500_sin_filtrar_el_mensaje_interno() -> None:
+    async with un_cliente(un_contenedor(sonda=SondaQueFalla())) as cliente:
+        respuesta = await cliente.get("/salud/listo")
+
+    assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert respuesta.json()["errorCode"] == "INTERNAL_ERROR"
+    assert respuesta.json()["message"] == "Ocurrió un error interno"
+    assert "secreto" not in respuesta.text
+
+
+def _eventos(salida: str) -> list[dict[str, object]]:
+    return [json.loads(linea) for linea in salida.splitlines() if linea.startswith("{")]
+
+
+async def test_un_error_inesperado_en_v1_responde_500_unificado_y_se_registra_una_sola_vez(
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    configure_logging("info")
+    contenedor = un_contenedor(RaisingNotaRepository(RuntimeError("detalle interno de la base")))
+
+    async with un_cliente(contenedor) as cliente:
+        respuesta = await cliente.get("/v1/notas/NOTA-000001")
+
+    registros = [evento for evento in _eventos(capsys.readouterr().out) if evento["event"] == "unexpected_error"]
+    assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert respuesta.json()["errorCode"] == "INTERNAL_ERROR"
+    assert "detalle interno" not in respuesta.text
+    assert len(registros) == 1
+    assert registros[0]["path"] == "/v1/notas/NOTA-000001"
+
+
+async def test_un_error_de_dominio_interno_responde_500_y_se_registra(capsys: pytest.CaptureFixture[str]) -> None:
+    configure_logging("info")
+    contenedor = un_contenedor(RaisingNotaRepository(FechaSinZonaHoraria()))
+
+    async with un_cliente(contenedor) as cliente:
+        respuesta = await cliente.get("/v1/notas/NOTA-000001")
+
+    registros = [evento for evento in _eventos(capsys.readouterr().out) if evento["event"] == "internal_domain_error"]
+    assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+    assert respuesta.json()["message"] == "Ocurrió un error interno"
+    assert len(registros) == 1
+
+
+async def test_el_detalle_de_un_cuerpo_invalido_trae_solo_ruta_y_mensaje_sin_repetir_lo_enviado() -> None:
+    async with un_cliente(un_contenedor()) as cliente:
+        respuesta = await cliente.post("/v1/notas", json={"titulo": 12345, "otro": "dato-del-cliente"})
+
+    detalles = respuesta.json()["details"]
+    assert {"path": "body.titulo", "message": "Input should be a valid string"} in detalles
+    assert all(set(detalle) == {"path", "message"} for detalle in detalles)
+    assert "dato-del-cliente" not in respuesta.text
+    assert "12345" not in respuesta.text
+
+
+async def test_un_estado_http_no_estandar_no_rompe_el_manejador() -> None:
+    app = FastAPI()
+    register_error_handlers(app, FixedClock())
+
+    @app.get("/raro")
+    async def raro() -> None:
+        raise StarletteHTTPException(status_code=499)
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://prueba") as cliente:
+        respuesta = await cliente.get("/raro")
+
+    assert respuesta.status_code == 499
+    assert respuesta.json()["errorCode"] == "HTTP_ERROR"
+
+
+async def _descartar(message: Message) -> None:  # noqa: ARG001
+    return None
+
+
+async def _sin_receive() -> Message:
+    return {"type": "http.request"}
+
+
+async def test_el_middleware_deja_pasar_los_alcances_que_no_son_http() -> None:
+    recibidos: list[str] = []
+
+    async def app(scope: Scope, receive: Receive, send: Send) -> None:  # noqa: ARG001
+        recibidos.append(scope["type"])
+
+    await UnexpectedErrorMiddleware(app, FixedClock())({"type": "lifespan"}, _sin_receive, _descartar)
+
+    assert recibidos == ["lifespan"]
+
+
+async def test_el_middleware_no_responde_dos_veces_si_el_error_llega_con_la_respuesta_empezada() -> None:
+    enviados: list[str] = []
+
+    async def app(scope: Scope, receive: Receive, send: Send) -> None:  # noqa: ARG001
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        message = "falla a mitad de la respuesta"
+        raise RuntimeError(message)
+
+    async def send(message: Message) -> None:
+        enviados.append(message["type"])
+
+    with pytest.raises(RuntimeError, match="mitad"):
+        await UnexpectedErrorMiddleware(app, FixedClock())(
+            {"type": "http", "method": "GET", "path": "/x", "headers": [], "query_string": b""}, _sin_receive, send
+        )
+
+    assert enviados == ["http.response.start"]
+
+
+@pytest.mark.parametrize("estado", [500, 502, 503], ids=["500", "502", "503"])
+async def test_un_error_http_del_servidor_lanzado_a_mano_se_registra_y_no_filtra_su_detalle(
+    capsys: pytest.CaptureFixture[str], estado: int
+) -> None:
+    configure_logging("info")
+    app = FastAPI()
+    register_error_handlers(app, FixedClock())
+
+    @app.get("/manual")
+    async def manual() -> None:
+        raise StarletteHTTPException(status_code=estado, detail="detalle interno del servidor")
+
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://prueba") as cliente:
+        respuesta = await cliente.get("/manual")
+
+    registros = [e for e in _eventos(capsys.readouterr().out) if e["event"] == "http_exception_server_error"]
+    assert respuesta.status_code == estado
+    assert respuesta.json()["errorCode"] == "INTERNAL_ERROR"
+    assert respuesta.json()["message"] == "Ocurrió un error interno"
+    assert "detalle interno" not in respuesta.text
+    assert len(registros) == 1

@@ -1,0 +1,147 @@
+[project]
+name = "migracion-fast-api"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.162.0",
+    "psycopg[binary,pool]>=3.3.6",
+    "pydantic-settings>=2.16.1",
+    "sqlalchemy[asyncio]>=2.1.6",
+    "structlog>=26.1.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "import-linter>=2.15",
+    "lefthook>=2.2.2",
+    "mypy>=2.4.0",
+    "openapi-core>=0.23.1",
+    "pip-audit>=2.10.1",
+    "poethepoet>=0.49.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.13,<0.14"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "app"
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = ["D", "COM812", "CPY", "N818"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-type-checking]
+runtime-evaluated-base-classes = ["pydantic.BaseModel", "pydantic_settings.BaseSettings"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["app", "tests"]
+
+[tool.ruff.lint.pylint]
+max-args = 5
+max-statements = 25
+max-branches = 8
+
+[tool.ruff.lint.mccabe]
+max-complexity = 8
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106", "PLR2004", "INP001", "TC001", "TC002", "TC003"]
+
+[tool.mypy]
+strict = true
+python_version = "3.14"
+mypy_path = "src:."
+files = ["src", "tests"]
+explicit_package_bases = true
+plugins = ["pydantic.mypy"]
+warn_unreachable = true
+enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_decorators = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers --strict-config --import-mode=importlib"
+markers = ["integration: pruebas contra una base PostgreSQL real"]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+omit = ["src/app/main.py", "src/app/__main__.py", "src/app/**/ports.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+fail_under = 97
+
+[tool.importlinter]
+root_package = "app"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "El dominio no depende de frameworks ni de drivers"
+type = "forbidden"
+source_modules = ["app.nota.domain"]
+forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
+
+[[tool.importlinter.contracts]]
+name = "Las capas apuntan hacia adentro"
+type = "layers"
+layers = ["app.nota.adapters", "app.nota.application", "app.nota.domain"]
+
+[[tool.importlinter.contracts]]
+name = "La aplicación no depende de frameworks ni de drivers"
+type = "forbidden"
+source_modules = ["app.nota.application"]
+forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
+
+[[tool.importlinter.contracts]]
+name = "El kernel compartido no importa contextos ni salud ni configuración"
+type = "forbidden"
+source_modules = ["app.shared"]
+forbidden_modules = ["app.nota", "app.health", "app.config"]
+
+[[tool.importlinter.contracts]]
+name = "Las carpetas puras no dependen de capas ni de frameworks"
+type = "forbidden"
+source_modules = ["app.constants", "app.enums", "app.errors"]
+forbidden_modules = ["app.shared", "app.nota", "app.health", "app.config", "app.composition", "fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
+
+[[tool.importlinter.contracts]]
+name = "La salud no importa contextos"
+type = "forbidden"
+source_modules = ["app.health"]
+forbidden_modules = ["app.nota"]
+
+[tool.poe.tasks]
+typecheck = "mypy"
+lint = "ruff check ."
+layers = "lint-imports"
+format = "ruff format ."
+format-check = "ruff format --check ."
+test = "pytest -m 'not integration'"
+test-coverage = "pytest -m 'not integration' --cov --cov-report=term-missing --cov-report=html --cov-report=xml --junitxml=reports/unitarias.xml"
+test-integration = "pytest -m integration"
+build = "uv build --wheel"
+audit = "pip-audit"
+hooks = "lefthook install"
+verificar = ["typecheck", "lint", "layers", "format-check", "test-coverage", "build", "audit"]
