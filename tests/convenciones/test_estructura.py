@@ -10,7 +10,7 @@ ARCHIVOS_DE_ERRORES = sorted(a for a in ARCHIVOS_DE_PRODUCCION if a.parent.name 
 ARCHIVOS_DE_ENUMS = sorted(a for a in ARCHIVOS_DE_PRODUCCION if a.parent.name == "enums" and a.name != "__init__.py")
 BASES_DE_ENUM = {"Enum", "StrEnum", "IntEnum"}
 FUNCIONES_DE_RE = {"compile", "match", "search", "fullmatch", "sub", "subn", "findall", "finditer", "split"}
-ARCHIVOS_CON_REGEX = {"nota/domain/patrones.py": "se arma con datos del propio dominio (excepción de BA67)"}
+ARCHIVOS_CON_REGEX: dict[str, str] = {}
 ARCHIVOS_DE_CONSTANTES = {"constantes.py"}
 
 

@@ -1,11 +1,11 @@
 # migracion-fast-api
 
-Base de un backend FastAPI con arquitectura hexagonal y DDD, con el mismo contrato de variables de entorno que el backend de incidencias. El contexto `nota` es un ejemplo para reemplazar al arrancar un proyecto real.
+Migración del backend de incidencias a FastAPI con arquitectura hexagonal y DDD, con el mismo contrato de variables de entorno y de API que el backend Node. El avance por fases está en `docs/plan-de-migracion.md`.
 
 ## Requisitos
 
 - Python 3.14.7 y `uv` 0.13.5.
-- PostgreSQL 16. El esquema lo crea su dueño; el DDL del ejemplo está en `docs/esquema/nota.sql`. Este servicio no migra.
+- PostgreSQL 16. El esquema es del bot de citas (`prisma/migrations` y `prisma/sql` de `minsa-citas-whatsapp-bot`). Este servicio no migra.
 
 ## Instalar, levantar y verificar
 
@@ -58,10 +58,11 @@ Hoy el código consume `NODE_ENV`, `PORT`, `LOG_LEVEL`, `DATABASE_URL`, `CORS_OR
 
 ## Pruebas contra la base y hooks
 
-Las pruebas de integración necesitan `TEST_DATABASE_URL`: una base PostgreSQL 16 desechable donde se puedan crear bases. El pre-push las corre (BT16), así que sin esa variable el push se detiene con un mensaje claro.
+Las pruebas de integración necesitan dos cosas: `TEST_DATABASE_URL`, un servidor PostgreSQL 16 desechable donde el usuario pueda crear bases, y una **base plantilla** ya migrada con el esquema del bot, cuyo nombre (por defecto `bd_plantilla_desechable`, o el de `TEST_TEMPLATE_DATABASE`) debe terminar en `_desechable`, `_dev` o `_local`. Cada prueba crea su propia base con `CREATE DATABASE … TEMPLATE …` y la borra al terminar. El pre-push las corre (BT16), así que sin `TEST_DATABASE_URL` el push se detiene con un mensaje claro.
 
 ```
 docker run -d --name pg-pruebas -e POSTGRES_USER=pruebas -e POSTGRES_PASSWORD=CLAVE -p 127.0.0.1:55432:5432 postgres:16
+# preparar bd_plantilla_desechable con las migraciones, funciones, disparadores y semillas del bot
 TEST_DATABASE_URL=postgresql://pruebas:CLAVE@127.0.0.1:55432/postgres uv run poe test-integration
 ```
 
@@ -84,7 +85,7 @@ src/app/
   errors/            una clase de error por archivo, con el nombre del archivo igual al de la clase
   health/            rutas /salud y /salud/listo
   shared/            núcleo compartido sin negocio: errores, reloj, logs, base, errores HTTP
-  <contexto>/        un contexto delimitado (hoy: nota)
+  <contexto>/        un contexto delimitado (hoy: catalogos)
     domain/          reglas de negocio puras y síncronas; sin frameworks ni drivers (errors/ propios, constantes y patrones)
     application/     casos de uso y puertos (protocolos); no conocen HTTP ni SQL
     adapters/
@@ -95,15 +96,15 @@ tests/               espejo exacto de src/app/
   convenciones/      pruebas que hacen cumplir las reglas del proyecto
 docs/
   calidad/           mediciones.md con la línea base y los umbrales
-  esquema/           DDL de referencia del contexto de ejemplo
-  plan-de-la-base.md decisiones, hecho y pendiente de la base
+  contrato/          v1.json y salud.json del backend Node, y su origen
+  plan-de-migracion.md fases de la migración y su estado
 ```
 
 - **Dependencias hacia adentro:** `adapters` importa `application`, y `application` importa `domain`. Nunca al revés. Lo vigila `import-linter`.
 - **Un contexto no importa de otro** ni de la implementación de otro; lo compartido va a `shared/`.
-- **Carpetas puras:** `constants/`, `enums/` y `errors/` no importan capas ni frameworks (`import-linter`). Los números de regla van en `constants/`; las expresiones regulares, solo en `nota/domain/patrones.py` (se arma con datos del dominio); una prueba lo vigila.
+- **Carpetas puras:** `constants/`, `enums/` y `errors/` no importan capas ni frameworks (`import-linter`). Los números de regla van en `constants/`; las expresiones regulares, solo en archivos de patrones (`<contexto>/domain/patrones.py`); una prueba lo vigila.
 - **Un archivo, una prueba:** `src/app/<ruta>/x.py` tiene su prueba en `tests/<ruta>/test_x.py`. Las excepciones (archivos de solo constantes, protocolos o arranque) están declaradas con su motivo en `tests/convenciones/test_codigo.py`.
-- **Nombres:** el dominio va en español (`nota`, `codigo`) y lo técnico en inglés (`repository`, `settings`).
+- **Nombres:** el dominio va en español (`catalogos`, `plazo`) y lo técnico en inglés (`repository`, `settings`).
 - **Contexto nuevo:** se crea `src/app/<contexto>/{domain,application,adapters}`, su espejo en `tests/` y se monta su router en `composition.py`.
 
 Los endpoints se documentan en la especificación OpenAPI de `/v1` (visible fuera de producción).

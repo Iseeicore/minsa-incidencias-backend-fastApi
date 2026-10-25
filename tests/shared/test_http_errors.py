@@ -7,17 +7,30 @@ from httpx import ASGITransport, AsyncClient
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.types import Message, Receive, Scope, Send
 
-from app.nota.domain.errors.fecha_sin_zona_horaria import FechaSinZonaHoraria
+from app.enums.error_category import ErrorCategory
+from app.enums.error_code import ErrorCode
+from app.errors.domain_error import DomainError
 from app.shared.http_errors import UnexpectedErrorMiddleware, register_error_handlers
 from app.shared.logging import configure_logging
 from tests.helpers.app_factory import un_cliente, un_contenedor
-from tests.helpers.fakes import FixedClock, RaisingNotaRepository
+from tests.helpers.app_minima import un_cliente_de, una_app_minima
+from tests.helpers.fakes import FixedClock, RaisingPlazoRepository
+
+RUTA = "/v1/catalogos/plazos"
 
 
 class SondaQueFalla:
     async def ping(self) -> bool:
         message = "secreto interno de la base"
         raise RuntimeError(message)
+
+
+class ErrorInternoDePrueba(DomainError):
+    category = ErrorCategory.INTERNAL
+    error_code = ErrorCode.INTERNAL_ERROR
+
+    def __init__(self) -> None:
+        super().__init__("detalle interno del dominio")
 
 
 @pytest.mark.parametrize("ruta", ["/no-existe", "/v1/no-existe"], ids=["raiz", "v1"])
@@ -37,11 +50,11 @@ async def test_una_ruta_inexistente_responde_con_el_formato_unico(ruta: str) -> 
 
 async def test_un_metodo_no_permitido_responde_405_con_el_formato_unico() -> None:
     async with un_cliente(un_contenedor()) as cliente:
-        respuesta = await cliente.delete("/v1/notas/NOTA-000001")
+        respuesta = await cliente.delete(RUTA)
 
     assert respuesta.status_code == HTTPStatus.METHOD_NOT_ALLOWED
     assert respuesta.json()["errorCode"] == "METHOD_NOT_ALLOWED"
-    assert respuesta.json()["path"] == "/v1/notas/NOTA-000001"
+    assert respuesta.json()["path"] == RUTA
 
 
 async def test_un_error_inesperado_responde_500_sin_filtrar_el_mensaje_interno() -> None:
@@ -62,38 +75,39 @@ async def test_un_error_inesperado_en_v1_responde_500_unificado_y_se_registra_un
     capsys: pytest.CaptureFixture[str],
 ) -> None:
     configure_logging("info")
-    contenedor = un_contenedor(RaisingNotaRepository(RuntimeError("detalle interno de la base")))
+    contenedor = un_contenedor(RaisingPlazoRepository(RuntimeError("detalle interno de la base")))
 
     async with un_cliente(contenedor) as cliente:
-        respuesta = await cliente.get("/v1/notas/NOTA-000001")
+        respuesta = await cliente.get(RUTA)
 
     registros = [evento for evento in _eventos(capsys.readouterr().out) if evento["event"] == "unexpected_error"]
     assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     assert respuesta.json()["errorCode"] == "INTERNAL_ERROR"
     assert "detalle interno" not in respuesta.text
     assert len(registros) == 1
-    assert registros[0]["path"] == "/v1/notas/NOTA-000001"
+    assert registros[0]["path"] == RUTA
 
 
 async def test_un_error_de_dominio_interno_responde_500_y_se_registra(capsys: pytest.CaptureFixture[str]) -> None:
     configure_logging("info")
-    contenedor = un_contenedor(RaisingNotaRepository(FechaSinZonaHoraria()))
+    contenedor = un_contenedor(RaisingPlazoRepository(ErrorInternoDePrueba()))
 
     async with un_cliente(contenedor) as cliente:
-        respuesta = await cliente.get("/v1/notas/NOTA-000001")
+        respuesta = await cliente.get(RUTA)
 
     registros = [evento for evento in _eventos(capsys.readouterr().out) if evento["event"] == "internal_domain_error"]
     assert respuesta.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
     assert respuesta.json()["message"] == "Ocurrió un error interno"
+    assert "detalle interno" not in respuesta.text
     assert len(registros) == 1
 
 
 async def test_el_detalle_de_un_cuerpo_invalido_trae_solo_ruta_y_mensaje_sin_repetir_lo_enviado() -> None:
-    async with un_cliente(un_contenedor()) as cliente:
-        respuesta = await cliente.post("/v1/notas", json={"titulo": 12345, "otro": "dato-del-cliente"})
+    async with un_cliente_de(una_app_minima()) as cliente:
+        respuesta = await cliente.post("/eco", json={"texto": 12345, "otro": "dato-del-cliente"})
 
     detalles = respuesta.json()["details"]
-    assert {"path": "body.titulo", "message": "Input should be a valid string"} in detalles
+    assert {"path": "body.texto", "message": "Input should be a valid string"} in detalles
     assert all(set(detalle) == {"path", "message"} for detalle in detalles)
     assert "dato-del-cliente" not in respuesta.text
     assert "12345" not in respuesta.text

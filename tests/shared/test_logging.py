@@ -9,11 +9,11 @@ from app.shared.logging import configure_logging
 def test_los_logs_salen_como_json_con_nivel_y_fecha(capsys: pytest.CaptureFixture[str]) -> None:
     configure_logging("info")
 
-    structlog.get_logger().info("nota_creada", codigo="NOTA-000001")
+    structlog.get_logger().info("plazos_listados", total=4)
 
     registro = json.loads(capsys.readouterr().out)
-    assert registro["event"] == "nota_creada"
-    assert registro["codigo"] == "NOTA-000001"
+    assert registro["event"] == "plazos_listados"
+    assert registro["total"] == 4
     assert registro["level"] == "info"
     assert registro["timestamp"].endswith("Z")
 

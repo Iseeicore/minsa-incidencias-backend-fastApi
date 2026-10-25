@@ -91,7 +91,7 @@ omit = ["src/app/main.py", "src/app/__main__.py", "src/app/**/ports.py"]
 [tool.coverage.report]
 show_missing = true
 skip_empty = true
-fail_under = 97
+fail_under = 98
 
 [tool.importlinter]
 root_package = "app"
@@ -100,37 +100,37 @@ include_external_packages = true
 [[tool.importlinter.contracts]]
 name = "El dominio no depende de frameworks ni de drivers"
 type = "forbidden"
-source_modules = ["app.nota.domain"]
+source_modules = ["app.catalogos.domain"]
 forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
 name = "Las capas apuntan hacia adentro"
 type = "layers"
-layers = ["app.nota.adapters", "app.nota.application", "app.nota.domain"]
+layers = ["app.catalogos.adapters", "app.catalogos.application", "app.catalogos.domain"]
 
 [[tool.importlinter.contracts]]
 name = "La aplicación no depende de frameworks ni de drivers"
 type = "forbidden"
-source_modules = ["app.nota.application"]
+source_modules = ["app.catalogos.application"]
 forbidden_modules = ["fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
 name = "El kernel compartido no importa contextos ni salud ni configuración"
 type = "forbidden"
 source_modules = ["app.shared"]
-forbidden_modules = ["app.nota", "app.health", "app.config"]
+forbidden_modules = ["app.catalogos", "app.health", "app.config"]
 
 [[tool.importlinter.contracts]]
 name = "Las carpetas puras no dependen de capas ni de frameworks"
 type = "forbidden"
 source_modules = ["app.constants", "app.enums", "app.errors"]
-forbidden_modules = ["app.shared", "app.nota", "app.health", "app.config", "app.composition", "fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
+forbidden_modules = ["app.shared", "app.catalogos", "app.health", "app.config", "app.composition", "fastapi", "starlette", "pydantic", "sqlalchemy", "psycopg", "structlog"]
 
 [[tool.importlinter.contracts]]
 name = "La salud no importa contextos"
 type = "forbidden"
 source_modules = ["app.health"]
-forbidden_modules = ["app.nota"]
+forbidden_modules = ["app.catalogos"]
 
 [tool.poe.tasks]
 typecheck = "mypy"

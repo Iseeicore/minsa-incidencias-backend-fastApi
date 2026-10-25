@@ -1,4 +1,5 @@
 GENERIC_HTTP_MESSAGE = "Error HTTP"
+SIN_SESION_MESSAGE = "Debes iniciar sesión."
 INTERNAL_ERROR_MESSAGE = "Ocurrió un error interno"
 REQUEST_INVALID_MESSAGE = "La petición no cumple el contrato"
 ROUTE_NOT_FOUND_MESSAGE = "La ruta no existe"
