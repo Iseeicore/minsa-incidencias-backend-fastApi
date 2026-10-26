@@ -2,6 +2,7 @@ import pytest
 from pydantic import ValidationError
 
 from app.config.comandos import DatosDeAdministradorEnv, DatosDeUsuarioDePruebaEnv
+from app.constants.sesion import MAX_EMAIL_LENGTH
 from app.enums.rol_codigo import RolCodigo
 
 CLAVE = "una-clave-larga-1"
@@ -31,7 +32,12 @@ def test_el_area_del_administrador_es_opcional_pero_no_puede_venir_vacia(monkeyp
 
 @pytest.mark.parametrize(
     ("campo", "valor"),
-    [("nombre", "   "), ("correo", "no-es-un-correo"), ("password", "corta")],
+    [
+        ("nombre", "   "),
+        ("correo", "no-es-un-correo"),
+        ("correo", "a" * MAX_EMAIL_LENGTH + "@minsa.gob.pe"),
+        ("password", "corta"),
+    ],
 )
 def test_un_dato_invalido_del_administrador_se_rechaza(monkeypatch: pytest.MonkeyPatch, campo: str, valor: str) -> None:
     validos = {"nombre": "Ana", "correo": "ana@minsa.gob.pe", "password": CLAVE}

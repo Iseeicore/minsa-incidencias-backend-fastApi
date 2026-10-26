@@ -50,5 +50,6 @@ Ninguna cambia el contrato que ve el frontend.
 - **Ficha de derivación de un análisis guardado:** aquí se tipa y se descarta (`null`) si no tiene la forma esperada; el Node la devuelve sin validar.
 - **Resumen del ciclo del clasificador:** no lleva `degradadas`, porque sin modelo siempre es cero.
 - **Vencimiento de la sesión en el flujo de eventos:** no se parte en tramos para evitar el desborde del temporizador de JavaScript; `asyncio` no tiene ese límite.
+- **Correo del inicio de sesión:** tiene tope de 254 caracteres, igual que el de usuarios; el Node no lo acotaba. Uno más largo recibe 400 `VALIDATION_FAILED` en lugar de 401, y ningún usuario puede tenerlo.
 - **`NODE_ENV`:** vale `production` si no se define; el Node usaba `development`.
 - **`DB_IDLE_TIMEOUT_MS`:** recicla conexiones por antigüedad; es una aproximación de la inactividad del pool de Node.
